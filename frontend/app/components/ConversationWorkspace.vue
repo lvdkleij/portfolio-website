@@ -1,0 +1,348 @@
+<script setup lang="ts">
+import type {
+  ChatClientError,
+  ChatMessage,
+  ChatRequest,
+  ChatRuntimeContext,
+  ChatSource,
+  ChatState,
+  ChatSubmission,
+  ChatTraceStage,
+  ChatUsage,
+  JobAttachment,
+  PastedJobAttachment
+} from '~/types/chat'
+import { limitChatHistory } from '~/utils/chatHistory'
+import { renderSafeMarkdown } from '~/utils/markdown'
+
+const props = defineProps<{ showExamples: boolean }>()
+const emit = defineEmits<{ runtimeChange: [runtime: ChatRuntimeContext] }>()
+
+type GuestTurn = {
+  id: string
+  user: ChatMessage
+  response: string
+  state: ChatState
+  trace: ChatTraceStage[]
+  sources: ChatSource[]
+  usage?: ChatUsage
+  error?: ChatClientError
+  requestId?: string
+  model?: string
+  durationMs?: number
+  attachment?: JobAttachment
+}
+
+const scrollArea = ref<HTMLElement>()
+const guestTurns = ref<GuestTurn[]>([])
+const activeTurnId = ref<string | null>(null)
+const followStream = ref(false)
+
+const {
+  state: streamState,
+  active,
+  responseText,
+  trace,
+  sources,
+  usage,
+  error,
+  requestId,
+  model,
+  durationMs,
+  coldStart,
+  start,
+  stop
+} = useChatStream()
+
+function createId(prefix: string) {
+  return globalThis.crypto?.randomUUID?.() ?? `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+function pastedAttachment(attachment?: JobAttachment): PastedJobAttachment | undefined {
+  if (attachment?.source !== 'paste' || !attachment.textExcerpt) return undefined
+  return {
+    type: 'pasted_job',
+    label: attachment.label,
+    content: attachment.textExcerpt.slice(0, 4000)
+  }
+}
+
+function requestMessagesThrough(turnId: string) {
+  const messages: ChatMessage[] = []
+
+  for (const turn of guestTurns.value) {
+    if (turn.id === turnId) {
+      messages.push(turn.user)
+      break
+    }
+
+    if (turn.state === 'complete' && turn.response.trim()) {
+      messages.push(turn.user, {
+        id: createId('assistant'),
+        role: 'assistant',
+        content: turn.response
+      })
+    }
+  }
+
+  return limitChatHistory(messages)
+}
+
+function activeTurn() {
+  return guestTurns.value.find(turn => turn.id === activeTurnId.value)
+}
+
+function syncActiveTurn() {
+  const turn = activeTurn()
+  if (!turn) return
+
+  turn.response = responseText.value
+  turn.state = streamState.value
+  turn.trace = [...trace.value]
+  turn.sources = [...sources.value]
+  turn.usage = usage.value ? { ...usage.value } : undefined
+  turn.error = error.value ? { ...error.value } : undefined
+  turn.requestId = requestId.value
+  turn.model = model.value
+  turn.durationMs = durationMs.value
+
+  emit('runtimeChange', {
+    state: turn.state,
+    requestId: turn.requestId,
+    model: turn.model,
+    durationMs: turn.durationMs,
+    trace: [...turn.trace],
+    sources: [...turn.sources],
+    usage: turn.usage ? { ...turn.usage } : undefined
+  })
+}
+
+watch(
+  [streamState, responseText, trace, sources, usage, error, requestId, model, durationMs],
+  syncActiveTurn,
+  { deep: true, flush: 'sync' }
+)
+
+watch(
+  () => guestTurns.value[guestTurns.value.length - 1]?.response.length ?? 0,
+  (length, previousLength) => {
+    if (length === previousLength || !followStream.value || !activeTurnId.value) return
+    scrollToMessage(activeTurnId.value, 'response', 'auto')
+  },
+  { flush: 'post' }
+)
+
+async function scrollToMessage(messageId: string, target: 'prompt' | 'response', behavior: ScrollBehavior = 'smooth') {
+  await nextTick()
+  const scroller = scrollArea.value
+  const message = scroller?.querySelector<HTMLElement>(`[data-message-id="${messageId}"]`)
+  const anchor = target === 'response'
+    ? message?.querySelector<HTMLElement>('.guest-answer')
+    : message?.querySelector<HTMLElement>('.question')
+
+  if (!scroller || !anchor) return
+
+  const scrollerRect = scroller.getBoundingClientRect()
+  const anchorRect = anchor.getBoundingClientRect()
+  const composerClearance = window.innerWidth <= 640 ? 170 : 205
+  const anchorBottom = anchorRect.bottom - scrollerRect.top + scroller.scrollTop
+
+  scroller.scrollTo({
+    top: Math.max(0, anchorBottom - scroller.clientHeight + composerClearance),
+    behavior
+  })
+}
+
+function pauseStreamFollow() {
+  if (active.value) followStream.value = false
+}
+
+async function runTurn(turn: GuestTurn) {
+  activeTurnId.value = turn.id
+  followStream.value = true
+  turn.response = ''
+  turn.state = 'connecting'
+  turn.trace = []
+  turn.sources = []
+  turn.usage = undefined
+  turn.error = undefined
+  turn.requestId = undefined
+  turn.model = undefined
+  turn.durationMs = undefined
+
+  const request: ChatRequest = {
+    clientRequestId: createId('request'),
+    messages: requestMessagesThrough(turn.id)
+  }
+
+  await start(request)
+
+  if (followStream.value) scrollToMessage(turn.id, 'response', 'auto')
+}
+
+function sendMessage(submission: ChatSubmission) {
+  if (active.value) return
+
+  const attachment = pastedAttachment(submission.attachment)
+  const id = createId('turn')
+  const turn = reactive<GuestTurn>({
+    id,
+    user: {
+      id: createId('user'),
+      role: 'user',
+      content: submission.prompt.slice(0, 4000),
+      attachment
+    },
+    response: '',
+    state: 'connecting',
+    trace: [],
+    sources: [],
+    attachment: submission.attachment?.source === 'paste' ? submission.attachment : undefined
+  })
+
+  guestTurns.value.push(turn)
+  scrollToMessage(turn.id, 'prompt')
+  void runTurn(turn)
+}
+
+function retryTurn(turn: GuestTurn) {
+  if (active.value || turn !== guestTurns.value[guestTurns.value.length - 1]) return
+  void runTurn(turn)
+}
+
+function stopStream() {
+  stop()
+}
+
+onMounted(() => {
+  emit('runtimeChange', { state: 'idle', trace: [], sources: [] })
+})
+
+onBeforeUnmount(stop)
+</script>
+
+<template>
+  <div id="top" class="conversation-workspace">
+    <main
+      ref="scrollArea"
+      class="transcript-scroll"
+      aria-label="Conversation with Lucas AI"
+      @wheel.passive="pauseStreamFollow"
+      @touchstart.passive="pauseStreamFollow"
+      @pointerdown="pauseStreamFollow"
+    >
+      <div v-if="!props.showExamples && guestTurns.length === 0" class="empty-chat">
+        <div class="empty-chat-mark" aria-hidden="true">
+          <i class="empty-chat-edge edge-one" />
+          <i class="empty-chat-edge edge-two" />
+          <i class="empty-chat-edge edge-three" />
+          <i class="empty-chat-node node-blue" />
+          <i class="empty-chat-node node-green" />
+          <i class="empty-chat-node node-gold" />
+        </div>
+        <h1>Ask about Lucas’s work, experience, or approach.</h1>
+      </div>
+
+      <div class="transcript">
+        <template v-if="props.showExamples">
+          <p class="example-conversation-label">Example conversations · not part of this chat</p>
+
+          <ConversationTurn label="YOU / EXAMPLE 01" muted>
+            <template #prompt>How does graph retrieval compare to standard vector search?</template>
+            <template #answer>
+              <h1>Vectors find neighbors; graphs find relationships.</h1>
+              <div class="artifact comparison">
+                <div>
+                  <small>Vector Search</small><i class="metric ink" />
+                  <p>Topological similarity based on semantic distance. Best for fuzzy matching but prone to missing non-linear logic.</p>
+                </div>
+                <div>
+                  <small>Graph Retrieval</small><i class="metric acid" />
+                  <p>Explicit relationship mapping through nodes and edges. Best for multi-step reasoning and structural truth.</p>
+                </div>
+              </div>
+            </template>
+          </ConversationTurn>
+
+          <ConversationTurn label="YOU / EXAMPLE 02">
+            <template #prompt>How does this assistant stay reliable?</template>
+            <template #answer-label><i class="rule" /></template>
+            <template #answer>
+              <h2>Reliability isn't a post-process; it's a multi-stage <em>verification pipeline</em> that enforces engineering rigor at every turn.</h2>
+              <div class="artifact pipeline-artifact">
+                <div class="pipeline">
+                  <div><i /><small>Input Guard</small></div><b>›</b>
+                  <div><i /><small>Retrieval</small></div><b>›</b>
+                  <div><i /><small>Tool Policy</small></div><b>›</b>
+                  <div><i /><small>Model Routing</small></div><b>›</b>
+                  <div><i /><small>Output Checks</small></div>
+                </div>
+                <p class="receipt">Illustrative reliability pipeline</p>
+              </div>
+              <p class="answer-copy">By decoupling intent from execution, I can apply hard boundaries on what the model can access. This keeps responses grounded in my actual corpus rather than speculative patterns.</p>
+            </template>
+          </ConversationTurn>
+        </template>
+
+        <div class="guest-messages" aria-live="polite" aria-relevant="additions text">
+          <ConversationTurn
+            v-for="(turn, index) in guestTurns"
+            :key="turn.id"
+            class="guest-turn"
+            :data-message-id="turn.id"
+            :label="`YOU / ${String(index + 1).padStart(2, '0')}`"
+          >
+            <template #prompt>
+              <span>{{ turn.user.content }}</span>
+              <span v-if="turn.attachment" class="turn-attachment">
+                <b>TXT</b>{{ turn.attachment.label }}
+              </span>
+            </template>
+
+            <template #answer-label>
+              <i v-if="turn.state === 'connecting' || turn.state === 'streaming'" class="typing" />
+              <i v-else class="rule" />
+            </template>
+
+            <template #answer>
+              <div v-if="turn.state === 'connecting' && !turn.response" class="thinking" role="status">
+                <span class="thinking-dots" aria-hidden="true"><i /><i /><i /></span>
+                <span>{{ coldStart && activeTurnId === turn.id ? 'Starting the assistant' : 'Connecting to the assistant' }}</span>
+              </div>
+
+              <div
+                v-if="turn.response"
+                class="guest-answer markdown-answer"
+                :class="{ 'is-streaming': turn.state === 'streaming' }"
+                :aria-busy="turn.state === 'streaming'"
+                v-html="renderSafeMarkdown(turn.response)"
+              />
+
+              <div v-if="turn.state === 'error' && turn.error" class="chat-response-state error" role="alert">
+                <span>{{ turn.error.message }}</span>
+                <small v-if="turn.error.retryAfterSeconds">Try again in about {{ turn.error.retryAfterSeconds }} seconds.</small>
+                <button v-if="turn.error.retryable" type="button" @click="retryTurn(turn)">Retry</button>
+              </div>
+
+              <div v-else-if="turn.state === 'cancelled'" class="chat-response-state cancelled" role="status">
+                <span>Response stopped.</span>
+                <button type="button" @click="retryTurn(turn)">Retry</button>
+              </div>
+
+              <PromptTrace
+                v-if="turn.state !== 'idle'"
+                :state="turn.state"
+                :steps="turn.trace"
+                :duration-ms="turn.durationMs"
+                :source-count="turn.sources.length"
+                :usage="turn.usage"
+              />
+            </template>
+          </ConversationTurn>
+        </div>
+      </div>
+    </main>
+
+    <StudioComposer :state="streamState" @send="sendMessage" @stop="stopStream" />
+  </div>
+</template>
