@@ -7,15 +7,15 @@ permissions:
 
 on:
   pull_request:
-    branches:
-      - main
     paths:
       - 'infrastructure/**'
+      - '.github/workflows/infra-unit-tests.yml'
   push:
     branches:
       - main
     paths:
       - 'infrastructure/**'
+      - '.github/workflows/infra-unit-tests.yml'
 
 env:
   ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
