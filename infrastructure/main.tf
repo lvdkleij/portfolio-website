@@ -1,5 +1,5 @@
 terraform {
-    # Configure the Azure Provider and version
+  # Configure the Azure Provider and version
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -7,7 +7,7 @@ terraform {
     }
   }
 
-    # Configure the backend to store the terraform state file in Azure Storage
+  # Configure the backend to store the terraform state file in Azure Storage
   backend "azurerm" {
     resource_group_name  = "rg-portfolio-prod"
     storage_account_name = "stportfolioprod"
