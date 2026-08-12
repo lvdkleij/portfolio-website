@@ -62,7 +62,7 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
     cooldown_period_in_seconds = 60
 
     container {
-      name   = "cac-portfolio-frontend-prod"
+      name   = "frontend"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
       cpu    = 0.25
       memory = "0.5Gi"
