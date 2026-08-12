@@ -22,30 +22,29 @@ provider "azurerm" {
   use_oidc = true
 }
 
-resource "azurerm_resource_group" "rg_portfolio_prod" {
-  name     = "rg-portfolio-prod"
-  location = "West Europe"
+data "azurerm_resource_group" "rg_portfolio_prod" {
+  name = "rg-portfolio-prod"
 }
 
 resource "azurerm_log_analytics_workspace" "log_portfolio_prod" {
   name                = "log-portfolio-prod"
-  location            = azurerm_resource_group.rg_portfolio_prod.location
-  resource_group_name = azurerm_resource_group.rg_portfolio_prod.name
+  location            = data.azurerm_resource_group.rg_portfolio_prod.location
+  resource_group_name = data.azurerm_resource_group.rg_portfolio_prod.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
 }
 
 resource "azurerm_container_app_environment" "cae_portfolio_prod" {
   name                       = "cae-portfolio-prod"
-  location                   = azurerm_resource_group.rg_portfolio_prod.location
-  resource_group_name        = azurerm_resource_group.rg_portfolio_prod.name
+  location                   = data.azurerm_resource_group.rg_portfolio_prod.location
+  resource_group_name        = data.azurerm_resource_group.rg_portfolio_prod.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.log_portfolio_prod.id
 }
 
 resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   name                         = "ca-portfolio-frontend-prod"
   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
-  resource_group_name          = azurerm_resource_group.rg_portfolio_prod.name
+  resource_group_name          = data.azurerm_resource_group.rg_portfolio_prod.name
   revision_mode                = "Single"
 
   ingress {
