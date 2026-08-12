@@ -27,24 +27,24 @@ resource "azurerm_resource_group" "rg_portfolio_prod" {
   location = "West Europe"
 }
 
-resource "azurerm_log_analytics_workspace" "log_portfolio_prod_weu_001" {
-  name                = "log-portfolio-prod-weu-001"
+resource "azurerm_log_analytics_workspace" "log_portfolio_prod" {
+  name                = "log-portfolio-prod"
   location            = azurerm_resource_group.rg_portfolio_prod.location
   resource_group_name = azurerm_resource_group.rg_portfolio_prod.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
 }
 
-resource "azurerm_container_app_environment" "cae_portfolio_prod_weu_001" {
-  name                       = "cae-portfolio-prod-weu-001"
+resource "azurerm_container_app_environment" "cae_portfolio_prod" {
+  name                       = "cae-portfolio-prod"
   location                   = azurerm_resource_group.rg_portfolio_prod.location
   resource_group_name        = azurerm_resource_group.rg_portfolio_prod.name
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.log_portfolio_prod_weu_001.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.log_portfolio_prod.id
 }
 
-resource "azurerm_container_app" "ca_portfolio_frontend_prod_weu_001" {
-  name                         = "ca-portfolio-frontend-prod-weu-001"
-  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod_weu_001.id
+resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
+  name                         = "ca-portfolio-frontend-prod"
+  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
   resource_group_name          = azurerm_resource_group.rg_portfolio_prod.name
   revision_mode                = "Single"
 
@@ -61,7 +61,7 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod_weu_001" {
     cooldown_period_in_seconds = 60
     
     container {
-      name   = "cac-portfolio-frontend-prod-weu-001"
+      name   = "cac-portfolio-frontend-prod"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
       cpu    = 0.25
       memory = "0.5Gi"
