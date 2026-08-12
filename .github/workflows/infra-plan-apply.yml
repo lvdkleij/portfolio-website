@@ -1,6 +1,16 @@
 name: 'Terraform Plan/Apply'
 
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infrastructure/**'
   push:
     branches:
       - main

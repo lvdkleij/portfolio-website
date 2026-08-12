@@ -1,5 +1,12 @@
 {
   "git.decorations.enabled": true,
   "explorer.decorations.colors": true,
-  "explorer.decorations.badges": true
+  "explorer.decorations.badges": true,
+  "github.copilot.enable": {
+    "*": false
+  },
+  "github.copilot.nextEditSuggestions.enabled": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false
 }
