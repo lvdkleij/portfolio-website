@@ -52,7 +52,8 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
     external_enabled = true
     target_port      = 80
     traffic_weight {
-      percentage = 100
+      percentage      = 100
+      latest_revision = true
     }
   }
   template {
