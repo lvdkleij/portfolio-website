@@ -22,7 +22,7 @@ provider "azurerm" {
   use_oidc = true
 }
 
-data "data.azurerm_resource_group" "rg_portfolio_prod" {
+data "azurerm_resource_group" "rg_portfolio_prod" {
   name     = "rg-portfolio-prod"
 }
 
