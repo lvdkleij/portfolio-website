@@ -50,16 +50,16 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
 
   ingress {
     external_enabled = true
-    target_port = 80
+    target_port      = 80
     traffic_weight {
       percentage = 100
     }
   }
   template {
-    min_replicas = 0
-    max_replicas = 1
+    min_replicas               = 0
+    max_replicas               = 1
     cooldown_period_in_seconds = 60
-    
+
     container {
       name   = "cac-portfolio-frontend-prod"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
