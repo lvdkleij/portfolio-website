@@ -143,6 +143,8 @@ jobs:
       run:
         working-directory: infrastructure
     needs: [terraform-plan]
+    environment: 
+      name: production
     
     steps:
       - name: Checkout
