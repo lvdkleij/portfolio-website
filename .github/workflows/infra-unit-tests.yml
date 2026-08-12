@@ -32,3 +32,17 @@ jobs:
 
       - name: Terraform Format
         run: terraform fmt -check -recursive
+
+      - name: Run Checkov action
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with: 
+          framework: terraform
+
+      - name: Upload SARIF file
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          category: checkov
+
