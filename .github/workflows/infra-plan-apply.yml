@@ -1,4 +1,4 @@
-name: 'Terraform Plan/Apply'
+name: Terraform Plan/Apply
 
 permissions:
   id-token: write
@@ -8,14 +8,14 @@ permissions:
 on:
   pull_request:
     paths:
-      - 'infrastructure/**'
-      - '.github/workflows/infra-plan-apply.yml'
+      - infrastructure/**
+      - .github/workflows/infra-plan-apply.yml
   push:
     branches:
       - main
     paths:
-      - 'infrastructure/**'
-      - '.github/workflows/infra-plan-apply.yml'
+      - infrastructure/**
+      - .github/workflows/infra-plan-apply.yml
 
 env:
   ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
