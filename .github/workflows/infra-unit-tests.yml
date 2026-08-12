@@ -3,6 +3,7 @@ name: "Terraform Unit Tests"
 on:
   pull_request:
     paths:
+      - '.github/workflows/infra-unit-tests.yml'
       - 'infrastructure/**'
 
 permissions:
