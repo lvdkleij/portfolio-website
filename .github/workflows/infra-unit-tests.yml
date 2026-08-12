@@ -37,6 +37,7 @@ jobs:
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with: 
+          directory: infrastructure
           framework: terraform
 
       - name: Upload SARIF file
