@@ -23,7 +23,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "rg_portfolio_prod" {
-  name     = "rg-portfolio-prod"
+  name = "rg-portfolio-prod"
 }
 
 resource "azurerm_log_analytics_workspace" "log_portfolio_prod" {
