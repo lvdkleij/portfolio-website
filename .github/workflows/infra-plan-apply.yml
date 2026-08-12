@@ -9,13 +9,13 @@ on:
   pull_request:
     paths:
       - 'infrastructure/**'
-      - '.github/workflows/infra-unit-tests.yml'
+      - '.github/workflows/infra-plan-apply.yml'
   push:
     branches:
       - main
     paths:
       - 'infrastructure/**'
-      - '.github/workflows/infra-unit-tests.yml'
+      - '.github/workflows/infra-plan-apply.yml'
 
 env:
   ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
