@@ -3,10 +3,9 @@ name: 'Terraform Plan/Apply'
 on:
   push:
     branches:
-    - main
-  pull_request:
-    branches:
-    - main
+      - main
+    paths:
+      - 'infrastructure/**'
 
 env:
   ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
