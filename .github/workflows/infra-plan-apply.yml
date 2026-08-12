@@ -109,3 +109,28 @@ jobs:
                   repo: context.repo.repo,
                   body: body
               })
+  terraform-apply:
+    name: Terraform Apply
+    #  if main branch and terraform exitcode = 2
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure
+    needs: [terraform-plan]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v8
+        with:
+          name: tfplan
+
+      
