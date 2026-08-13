@@ -64,8 +64,8 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
 
     container {
       name = "frontend"
-      # Image is only used for initial creation of the container.
-      # New image deployments happen in the frontend-deploy.yml
+      # 'image' is only used for initial creation of the container. 
+      # Image updates happen in the frontend-deploy.yml
       image  = "lakleij/portfolio-frontend:latest"
       cpu    = 0.25
       memory = "0.5Gi"
