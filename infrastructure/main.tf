@@ -165,3 +165,25 @@ resource "azurerm_container_app_custom_domain" "frontend_www" {
     ]
   }
 }
+
+resource "azurerm_container_app_environment_managed_certificate" "frontend_apex" {
+  name                         = "mc-portfolio-frontend-apex"
+  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+  subject_name                 = var.domain_name
+  domain_control_validation    = "HTTP"
+
+  depends_on = [
+    azurerm_container_app_custom_domain.frontend_apex
+  ]
+}
+
+resource "azurerm_container_app_environment_managed_certificate" "frontend_www" {
+  name                         = "mc-portfolio-frontend-www"
+  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+  subject_name                 = "www.${var.domain_name}"
+  domain_control_validation    = "CNAME"
+
+  depends_on = [
+    azurerm_container_app_custom_domain.frontend_www
+  ]
+}
