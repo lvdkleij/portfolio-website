@@ -56,6 +56,7 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
       latest_revision = true
     }
   }
+
   template {
     min_replicas               = 0
     max_replicas               = 1
@@ -63,9 +64,18 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
 
     container {
       name   = "frontend"
-      image  = "mcr.microsoft.com/k8se/quickstart:latest"
+      # Image is only used for initial creation of the container.
+      # New image deployments happen in the frontend-deploy.yml
+      image  = "lakleij/portfolio-frontend:latest"
       cpu    = 0.25
       memory = "0.5Gi"
     }
   }
+
+  lifecycle {
+    ignore_changes = [ 
+      template[0].container[0].image
+     ]
+  }
 }
+
