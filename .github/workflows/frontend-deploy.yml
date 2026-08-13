@@ -4,6 +4,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/portfolio-frontend
+
 on:
   push:
     branches:
@@ -44,8 +47,8 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/portfolio-frontend:${{ github.sha }}
-            ${{ vars.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
 
       - name: Log in to Azure
         uses: azure/login@v3
@@ -60,4 +63,4 @@ jobs:
             --name ca-portfolio-frontend-prod \
             --resource-group rg-portfolio-prod \
             --container-name frontend \
-            --image lakleij/portfolio-frontend:${{ github.sha }}
+            --image ${{ env.IMAGE_NAME }}:${{ github.sha }}
