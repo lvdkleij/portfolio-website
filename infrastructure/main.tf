@@ -63,7 +63,7 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
     cooldown_period_in_seconds = 60
 
     container {
-      name   = "frontend"
+      name = "frontend"
       # Image is only used for initial creation of the container.
       # New image deployments happen in the frontend-deploy.yml
       image  = "lakleij/portfolio-frontend:latest"
@@ -73,9 +73,9 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   }
 
   lifecycle {
-    ignore_changes = [ 
+    ignore_changes = [
       template[0].container[0].image
-     ]
+    ]
   }
 }
 
