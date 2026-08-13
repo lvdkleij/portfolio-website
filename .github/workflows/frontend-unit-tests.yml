@@ -1,0 +1,28 @@
+name: Frontend Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - frontend/**
+      - .github/workflows/frontend-tests.yml
+  pull_request:
+    paths:
+      - .github/workflows/frontend-unit-tests.yml
+      - frontend/**
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-unit-tests:
+    name: Frontend Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4

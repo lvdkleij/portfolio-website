@@ -1,17 +1,17 @@
-name: "Terraform Unit Tests"
+name: Terraform Unit Tests
 
 on:
   pull_request:
     paths:
-      - '.github/workflows/infra-unit-tests.yml'
-      - 'infrastructure/**'
+      - .github/workflows/infra-unit-tests.yml
+      - infrastructure/**
 
 permissions:
   contents: read
 
 jobs:
   terraform-unit-tests:
-    name: 'Terraform Unit Tests'
+    name: Terraform Unit Tests
     runs-on: ubuntu-latest
     defaults:
       run:
