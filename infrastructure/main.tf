@@ -199,6 +199,13 @@ resource "cloudflare_universal_ssl_setting" "portfolio" {
   enabled = true
 }
 
+################################
+################################
+#####
+##### Microsoft Foundry
+#####
+################################
+################################
 resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   name                       = "aif-portfolio-prod"
   location                   = data.azurerm_resource_group.rg_portfolio_prod.location
