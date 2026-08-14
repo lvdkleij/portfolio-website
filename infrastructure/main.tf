@@ -104,7 +104,7 @@ resource "cloudflare_dns_record" "frontend_apex" {
   type    = "A"
   content = azurerm_container_app_environment.cae_portfolio_prod.static_ip_address
   ttl     = 1
-  proxied = false
+  proxied = true
 }
 
 resource "cloudflare_dns_record" "frontend_apex_verification" {
@@ -138,7 +138,7 @@ resource "cloudflare_dns_record" "frontend_www" {
   type    = "CNAME"
   content = azurerm_container_app.ca_portfolio_frontend_prod.ingress[0].fqdn
   ttl     = 1
-  proxied = false
+  proxied = true
 }
 
 resource "cloudflare_dns_record" "frontend_www_verification" {
@@ -186,4 +186,15 @@ resource "azurerm_container_app_environment_managed_certificate" "frontend_www" 
   depends_on = [
     azurerm_container_app_custom_domain.frontend_www
   ]
+}
+
+resource "cloudflare_zone_setting" "ssl" {
+  zone_id    = var.cloudflare_zone_id
+  setting_id = "ssl"
+  value      = "strict"
+}
+
+resource "cloudflare_universal_ssl_setting" "portfolio" {
+  zone_id = var.cloudflare_zone_id
+  enabled = true
 }
