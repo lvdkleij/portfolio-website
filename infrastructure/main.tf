@@ -214,7 +214,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   sku_name                   = "S0"
   project_management_enabled = true
   custom_subdomain_name      = "aif-portfolio-prod"
-  local_auth_enabled         = true
+  local_auth_enabled         = false
 
   identity {
     type = "SystemAssigned"
