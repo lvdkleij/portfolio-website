@@ -201,8 +201,8 @@ resource "cloudflare_universal_ssl_setting" "portfolio" {
 
 resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   name                       = "aif-portfolio-prod"
-  location                   = azurerm_resource_group.rg_portfolio_prod.location
-  resource_group_name        = azurerm_resource_group.rg_portfolio_prod.name
+  location                   = data.azurerm_resource_group.rg_portfolio_prod.location
+  resource_group_name        = data.azurerm_resource_group.rg_portfolio_prod.name
   kind                       = "AIServices"
   sku_name                   = "S0"
   project_management_enabled = true
@@ -217,7 +217,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
 resource "azurerm_cognitive_account_project" "aif_proj_portfolio_prod" {
   name                 = "aif_proj_portfolio_prod"
   cognitive_account_id = azurerm_cognitive_account.aif_portfolio_prod.id
-  location             = azurerm_resource_group.rg_portfolio_prod.location
+  location             = data.azurerm_resource_group.rg_portfolio_prod.location
   description          = "Project used to manage AI services used by portfolio website"
   display_name         = "Portfolio Project"
 
