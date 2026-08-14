@@ -206,6 +206,10 @@ resource "cloudflare_universal_ssl_setting" "portfolio" {
 #####
 ################################
 ################################
+
+
+#checkov:skip=CKV_AZURE_134: Temporary enable public access for (still RBAC is needed to access it)
+#checkov:skip=CKV2_AZURE_22: Microsoft-managed encryption is sufficient for this non-regulated portfolio workload.
 resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   name                       = "aif-portfolio-prod"
   location                   = data.azurerm_resource_group.rg_portfolio_prod.location
@@ -220,6 +224,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
     type = "SystemAssigned"
   }
 }
+
 
 resource "azurerm_cognitive_account_project" "aif_proj_portfolio_prod" {
   name                 = "aif_proj_portfolio_prod"
