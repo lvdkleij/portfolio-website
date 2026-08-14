@@ -47,7 +47,6 @@
 
   <modules>
     <module>modules/bootstrap</module>
-    <module>modules/infrastructure/chatclient</module>
     <module>modules/api/rest</module>
     <module>modules/domain</module>
   </modules>
