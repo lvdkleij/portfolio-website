@@ -1,6 +1,9 @@
 # Terraform working directories
 **/.terraform/*
 
+# Package manager cache
+.pnpm-store/
+
 # Terraform state
 *.tfstate
 *.tfstate.*

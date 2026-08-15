@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { ChatState, ChatSubmission, JobAttachment } from '~/types/chat'
+import { MAX_CHAT_PROMPT_LENGTH } from '~/utils/chatLimits'
 
 const props = withDefaults(defineProps<{ state?: ChatState }>(), { state: 'idle' })
 
@@ -15,8 +17,14 @@ const attachment = ref<JobAttachment>()
 const emit = defineEmits<{ send: [submission: ChatSubmission], stop: [] }>()
 const active = computed(() => props.state === 'connecting' || props.state === 'streaming')
 function resize() { if (input.value) { input.value.style.height = 'auto'; input.value.style.height = `${Math.min(input.value.scrollHeight, 180)}px` } }
+function handleInput() {
+  if (prompt.value.length > MAX_CHAT_PROMPT_LENGTH) {
+    prompt.value = prompt.value.slice(0, MAX_CHAT_PROMPT_LENGTH)
+  }
+  nextTick(resize)
+}
 function submit() {
-  const value = prompt.value.trim()
+  const value = prompt.value.slice(0, MAX_CHAT_PROMPT_LENGTH).trim()
   if (!value || active.value) return
   emit('send', {
     prompt: value,
@@ -104,7 +112,7 @@ onBeforeUnmount(() => {
           <small>{{ attachment.source }}</small>
           <button type="button" aria-label="Remove job description" @click="removeAttachment">×</button>
         </div>
-        <textarea id="prompt" ref="input" v-model="prompt" rows="2" maxlength="4000" placeholder="Ask Lucas anything about full-stack engineering…" @input="resize" @keydown="handleKeydown" />
+        <textarea id="prompt" ref="input" v-model="prompt" rows="2" :maxlength="MAX_CHAT_PROMPT_LENGTH" placeholder="Ask Lucas anything about full-stack engineering…" @input="handleInput" @keydown="handleKeydown" />
         <div class="composer-controls">
           <div class="composer-meta">
             <button

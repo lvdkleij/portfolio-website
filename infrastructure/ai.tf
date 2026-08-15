@@ -42,6 +42,7 @@ resource "azurerm_cognitive_deployment" "aif_cd_portfolio_prod" {
     name     = "GlobalStandard"
     capacity = 1
   }
+  dynamic_throttling_enabled = false
 
   version_upgrade_option = "NoAutoUpgrade"
 }
