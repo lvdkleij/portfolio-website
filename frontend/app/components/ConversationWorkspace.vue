@@ -13,9 +13,9 @@ import type {
   PastedJobAttachment
 } from '~/types/chat'
 import { limitChatHistory } from '~/utils/chatHistory'
+import { MAX_CHAT_PROMPT_LENGTH } from '~/utils/chatLimits'
 import { renderSafeMarkdown } from '~/utils/markdown'
 
-const props = defineProps<{ showExamples: boolean }>()
 const emit = defineEmits<{ runtimeChange: [runtime: ChatRuntimeContext] }>()
 
 type GuestTurn = {
@@ -190,7 +190,7 @@ function sendMessage(submission: ChatSubmission) {
     user: {
       id: createId('user'),
       role: 'user',
-      content: submission.prompt.slice(0, 4000),
+      content: submission.prompt.slice(0, MAX_CHAT_PROMPT_LENGTH),
       attachment
     },
     response: '',
@@ -231,7 +231,7 @@ onBeforeUnmount(stop)
       @touchstart.passive="pauseStreamFollow"
       @pointerdown="pauseStreamFollow"
     >
-      <div v-if="!props.showExamples && guestTurns.length === 0" class="empty-chat">
+      <div v-if="guestTurns.length === 0" class="empty-chat">
         <div class="empty-chat-mark" aria-hidden="true">
           <i class="empty-chat-edge edge-one" />
           <i class="empty-chat-edge edge-two" />
@@ -244,46 +244,6 @@ onBeforeUnmount(stop)
       </div>
 
       <div class="transcript">
-        <template v-if="props.showExamples">
-          <p class="example-conversation-label">Example conversations · not part of this chat</p>
-
-          <ConversationTurn label="YOU / EXAMPLE 01" muted>
-            <template #prompt>How does graph retrieval compare to standard vector search?</template>
-            <template #answer>
-              <h1>Vectors find neighbors; graphs find relationships.</h1>
-              <div class="artifact comparison">
-                <div>
-                  <small>Vector Search</small><i class="metric ink" />
-                  <p>Topological similarity based on semantic distance. Best for fuzzy matching but prone to missing non-linear logic.</p>
-                </div>
-                <div>
-                  <small>Graph Retrieval</small><i class="metric acid" />
-                  <p>Explicit relationship mapping through nodes and edges. Best for multi-step reasoning and structural truth.</p>
-                </div>
-              </div>
-            </template>
-          </ConversationTurn>
-
-          <ConversationTurn label="YOU / EXAMPLE 02">
-            <template #prompt>How does this assistant stay reliable?</template>
-            <template #answer-label><i class="rule" /></template>
-            <template #answer>
-              <h2>Reliability isn't a post-process; it's a multi-stage <em>verification pipeline</em> that enforces engineering rigor at every turn.</h2>
-              <div class="artifact pipeline-artifact">
-                <div class="pipeline">
-                  <div><i /><small>Input Guard</small></div><b>›</b>
-                  <div><i /><small>Retrieval</small></div><b>›</b>
-                  <div><i /><small>Tool Policy</small></div><b>›</b>
-                  <div><i /><small>Model Routing</small></div><b>›</b>
-                  <div><i /><small>Output Checks</small></div>
-                </div>
-                <p class="receipt">Illustrative reliability pipeline</p>
-              </div>
-              <p class="answer-copy">By decoupling intent from execution, I can apply hard boundaries on what the model can access. This keeps responses grounded in my actual corpus rather than speculative patterns.</p>
-            </template>
-          </ConversationTurn>
-        </template>
-
         <div class="guest-messages" aria-live="polite" aria-relevant="additions text">
           <ConversationTurn
             v-for="(turn, index) in guestTurns"
