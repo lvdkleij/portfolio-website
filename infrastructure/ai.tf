@@ -27,3 +27,21 @@ resource "azurerm_cognitive_account_project" "aif_proj_portfolio_prod" {
     type = "SystemAssigned"
   }
 }
+
+resource "azurerm_cognitive_deployment" "aif_cd_portfolio_prod" {
+  name                 = "aif_cd_portfolio_prod"
+  cognitive_account_id = azurerm_cognitive_account.aif_portfolio_prod.id
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-4.1-mini"
+    version = "2025-04-14"
+  }
+
+  sku {
+    name = "GlobalStandard"
+    capacity = 1
+  }
+
+  version_upgrade_option = "NoAutoUpgrade"
+}
