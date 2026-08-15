@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
     public: {
-      chatApiUrl: 'http://localhost:8080/api/chat',
+      chatApiUrl: '/api/hello',
       resumeUrl: ''
     }
   },

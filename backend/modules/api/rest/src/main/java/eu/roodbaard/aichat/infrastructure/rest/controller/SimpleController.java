@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class SimpleController {
-
-
-
     @GetMapping("/hello")
     public String chat(@RequestParam("message") String message) {
         return "Hello";
