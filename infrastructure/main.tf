@@ -98,6 +98,45 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   }
 }
 
+resource "azurerm_container_app" "ca_portfolio_backend_prod" {
+  name                         = "ca-portfolio-backend-prod"
+  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+  resource_group_name          = data.azurerm_resource_group.rg_portfolio_prod.name
+  revision_mode                = "Single"
+
+  ingress {
+    external_enabled = false
+    target_port      = 80
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
+    }
+  }
+
+  template {
+    min_replicas               = 0
+    max_replicas               = 1
+    cooldown_period_in_seconds = 60
+
+    container {
+      name = "backend"
+      # 'image' is only used for initial creation of the container. 
+      # Image updates happen in the backend-deploy.yml
+      image  = "lakleij/portfolio-backend:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      template[0].container[0].image
+    ]
+  }
+}
+
+
+# ##
 resource "cloudflare_dns_record" "frontend_apex" {
   zone_id = var.cloudflare_zone_id
   name    = "@"
