@@ -88,8 +88,15 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
       image  = "lakleij/portfolio-frontend:latest"
       cpu    = 0.25
       memory = "0.5Gi"
+
+      env {
+        name  = "BACKEND_BASE_URL"
+        value = "http://ca-portfolio-backend-prod"
+      }
     }
   }
+
+  
 
   lifecycle {
     ignore_changes = [
