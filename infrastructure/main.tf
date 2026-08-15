@@ -90,6 +90,8 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
       memory = "0.5Gi"
 
       env {
+        # Because the backend and frontend Container Apps share the same environment,
+        # the frontend can privately reach the backend through its internal ingress.
         name  = "BACKEND_BASE_URL"
         value = "http://ca-portfolio-backend-prod"
       }
