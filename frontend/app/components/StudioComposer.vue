@@ -16,6 +16,7 @@ const privacyOpen = ref(false)
 const attachment = ref<JobAttachment>()
 const emit = defineEmits<{ send: [submission: ChatSubmission], stop: [] }>()
 const active = computed(() => props.state === 'connecting' || props.state === 'streaming')
+const nearPromptLimit = computed(() => prompt.value.length >= MAX_CHAT_PROMPT_LENGTH - 50)
 function resize() { if (input.value) { input.value.style.height = 'auto'; input.value.style.height = `${Math.min(input.value.scrollHeight, 180)}px` } }
 function handleInput() {
   if (prompt.value.length > MAX_CHAT_PROMPT_LENGTH) {
@@ -112,7 +113,7 @@ onBeforeUnmount(() => {
           <small>{{ attachment.source }}</small>
           <button type="button" aria-label="Remove job description" @click="removeAttachment">×</button>
         </div>
-        <textarea id="prompt" ref="input" v-model="prompt" rows="2" :maxlength="MAX_CHAT_PROMPT_LENGTH" placeholder="Ask Lucas anything about full-stack engineering…" @input="handleInput" @keydown="handleKeydown" />
+        <textarea id="prompt" ref="input" v-model="prompt" rows="2" :maxlength="MAX_CHAT_PROMPT_LENGTH" aria-describedby="prompt-character-count" placeholder="Ask Lucas anything about full-stack engineering…" @input="handleInput" @keydown="handleKeydown" />
         <div class="composer-controls">
           <div class="composer-meta">
             <button
@@ -152,6 +153,12 @@ onBeforeUnmount(() => {
             </div>
           </div>
           <div class="composer-actions">
+            <span
+              id="prompt-character-count"
+              class="composer-character-count"
+              :class="{ 'is-near-limit': nearPromptLimit }"
+              :aria-label="`${prompt.length} of ${MAX_CHAT_PROMPT_LENGTH} characters used`"
+            >{{ prompt.length }} / {{ MAX_CHAT_PROMPT_LENGTH }}</span>
             <button class="voice-trigger" type="button" :disabled="active" aria-label="Start voice input" title="Start voice input" @click="startListening">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="9" y="2" width="6" height="12" rx="3" />
