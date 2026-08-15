@@ -39,7 +39,7 @@ resource "azurerm_cognitive_deployment" "aif_cd_portfolio_prod" {
   }
 
   sku {
-    name = "GlobalStandard"
+    name     = "GlobalStandard"
     capacity = 1
   }
 
