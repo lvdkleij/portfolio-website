@@ -36,10 +36,6 @@
       <groupId>eu.roodbaard</groupId>
       <artifactId>domain</artifactId>
     </dependency>
-    <dependency>
-      <groupId>eu.roodbaard</groupId>
-      <artifactId>chatclient</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
