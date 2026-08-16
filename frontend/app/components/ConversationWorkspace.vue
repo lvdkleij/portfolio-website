@@ -259,11 +259,6 @@ onBeforeUnmount(stop)
               </span>
             </template>
 
-            <template #answer-label>
-              <i v-if="turn.state === 'connecting' || turn.state === 'streaming'" class="typing" />
-              <i v-else class="rule" />
-            </template>
-
             <template #answer>
               <div v-if="turn.state === 'connecting' && !turn.response" class="thinking" role="status">
                 <span class="thinking-dots" aria-hidden="true"><i /><i /><i /></span>
