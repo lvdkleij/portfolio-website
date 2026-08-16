@@ -10,9 +10,9 @@ RUN pnpm run build
 FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
-ENV NITRO_PORT=80
+ENV NITRO_PORT=8080
 ENV NITRO_HOST=0.0.0.0
 COPY --from=build /app/.output/ ./
-EXPOSE 80
+EXPOSE 8080
 USER node
 CMD ["node", "/app/server/index.mjs"]
