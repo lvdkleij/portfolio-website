@@ -211,7 +211,7 @@ textarea:focus-visible {
 .transcript-scroll {
   flex: 1;
   overflow-y: scroll;
-  padding-bottom: 280px;
+  padding-bottom: 100px;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: var(--sage) rgba(138, 143, 132, 0.18);
@@ -233,7 +233,7 @@ textarea::-webkit-scrollbar-thumb {
 .transcript {
   width: min(var(--content), calc(100% - 48px));
   margin: auto;
-  padding: 48px 0 96px;
+  padding: 48px 0 72px;
   display: flex;
   flex-direction: column;
   gap: 96px;
@@ -437,7 +437,7 @@ textarea::-webkit-scrollbar-thumb {
   position: absolute;
   z-index: 40;
   right: 0;
-  bottom: 24px;
+  bottom: 12px;
   left: 0;
   width: 100%;
   margin: auto;
@@ -1018,7 +1018,7 @@ textarea::-webkit-scrollbar-thumb {
   gap: 96px;
 }
 .guest-turn {
-  scroll-margin-bottom: 250px;
+  scroll-margin-bottom: 120px;
 }
 .guest-answer {
   max-width: 64ch;

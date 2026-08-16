@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { resolveMessageAnchor } from '../app/utils/chatScroll'
+import { describe, expect, it } from 'vitest';
+import { resolveMessageAnchor } from '../app/utils/chatScroll';
 
 describe('resolveMessageAnchor', () => {
   it('finds the assistant response inside the matching conversation turn', () => {
@@ -12,12 +12,12 @@ describe('resolveMessageAnchor', () => {
           </div>
         </section>
       </main>
-    `
+    `;
 
-    const scroller = document.getElementById('scroller')
+    const scroller = document.getElementById('scroller');
 
-    expect(scroller).not.toBeNull()
-    expect(resolveMessageAnchor(scroller!, 'turn-1', 'response')?.textContent).toBe('Response')
-    expect(resolveMessageAnchor(scroller!, 'turn-1', 'prompt')?.classList.contains('question')).toBe(true)
-  })
-})
+    expect(scroller).not.toBeNull();
+    expect(resolveMessageAnchor(scroller!, 'turn-1', 'response')?.textContent).toBe('Response');
+    expect(resolveMessageAnchor(scroller!, 'turn-1', 'prompt')?.classList.contains('question')).toBe(true);
+  });
+});
