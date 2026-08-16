@@ -16,6 +16,11 @@
       <artifactId>spring-ai-starter-model-openai</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-identity</artifactId>
+      <version>1.18.4</version>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>domain</artifactId>
     </dependency>
