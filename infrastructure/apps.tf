@@ -62,7 +62,7 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
   ingress {
     external_enabled = false
     target_port      = 8080
-    
+
     traffic_weight {
       percentage      = 100
       latest_revision = true
