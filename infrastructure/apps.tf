@@ -87,6 +87,16 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
       template[0].container[0].image
     ]
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
+  scope                = azurerm_cognitive_deployment.aif_cd_portfolio_prod.id
+  role_definition_name = "Cognitive Services User" # or? "Foundry Agent Consumer"
+  principal_id         = azurerm_container_app.ca_portfolio_backend_prod.identity[0].principal_id
 }
 
 
