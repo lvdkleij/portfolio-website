@@ -10,8 +10,16 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   local_auth_enabled            = false
   public_network_access_enabled = false
 
+
   identity {
     type = "SystemAssigned"
+  }
+
+  network_acls {
+    default_action = "Deny"
+    virtual_network_rules {
+      subnet_id = azurerm_subnet.snet_container_apps_prod.id
+    }
   }
 }
 

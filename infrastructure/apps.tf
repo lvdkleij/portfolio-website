@@ -4,6 +4,7 @@ resource "azurerm_container_app_environment" "cae_portfolio_prod" {
   resource_group_name        = data.azurerm_resource_group.rg_portfolio_prod.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.log_portfolio_prod.id
   logs_destination           = "log-analytics"
+  infrastructure_subnet_id   = azurerm_subnet.snet_container_apps_prod.id
 }
 
 resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
