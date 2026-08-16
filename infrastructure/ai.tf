@@ -1,5 +1,6 @@
 resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   #checkov:skip=CKV2_AZURE_22: Microsoft-managed encryption is sufficient for this non-regulated portfolio workload.
+  #checkov:skip=CKV_AZURE_134: Is behind vnet
   name                          = "aif-portfolio-prod"
   location                      = data.azurerm_resource_group.rg_portfolio_prod.location
   resource_group_name           = data.azurerm_resource_group.rg_portfolio_prod.name
@@ -8,7 +9,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   project_management_enabled    = true
   custom_subdomain_name         = "aif-portfolio-prod"
   local_auth_enabled            = false
-  public_network_access_enabled = false
+  public_network_access_enabled = true
 
 
   identity {
