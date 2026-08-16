@@ -2614,7 +2614,7 @@ textarea::-webkit-scrollbar-thumb {
   text-align: right;
 }
 .question-bubble {
-  padding: 8px;
+  padding: 8px 12px;
   border: 1px solid var(--sage);
   border-radius: 22px;
   background: var(--fresh);
