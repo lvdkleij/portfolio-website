@@ -8,6 +8,7 @@ env:
   IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/portfolio-backend
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
