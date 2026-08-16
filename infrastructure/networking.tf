@@ -11,9 +11,9 @@ resource "azurerm_subnet" "snet_container_apps_prod" {
   virtual_network_name = azurerm_virtual_network.vnet_portfolio_prod.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  service_endpoints = [
-    "Microsoft.CognitiveServices"
-  ]
+  service_endpoint {
+    service = "Microsoft.CognitiveService"
+  }
 
   delegation {
     name = "container-apps"
