@@ -15,6 +15,7 @@ import type {
 import { limitChatHistory } from '~/utils/chatHistory'
 import { MAX_CHAT_PROMPT_LENGTH } from '~/utils/chatLimits'
 import { renderSafeMarkdown } from '~/utils/markdown'
+import { resolveMessageAnchor } from '~/utils/chatScroll'
 
 const emit = defineEmits<{ runtimeChange: [runtime: ChatRuntimeContext] }>()
 
@@ -135,12 +136,10 @@ watch(
 async function scrollToMessage(messageId: string, target: 'prompt' | 'response', behavior: ScrollBehavior = 'smooth') {
   await nextTick()
   const scroller = scrollArea.value
-  const message = scroller?.querySelector<HTMLElement>(`[data-message-id="${messageId}"]`)
-  const anchor = target === 'response'
-    ? message?.querySelector<HTMLElement>('.guest-answer')
-    : message?.querySelector<HTMLElement>('.question')
+  if (!scroller) return
 
-  if (!scroller || !anchor) return
+  const anchor = resolveMessageAnchor(scroller, messageId, target)
+  if (!anchor) return
 
   const scrollerRect = scroller.getBoundingClientRect()
   const anchorRect = anchor.getBoundingClientRect()
