@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OllamaChatClientService implements ChatClientService {
+public class OpenApiChatClientService implements ChatClientService {
 
     private final ChatClient chatClient;
 
-    public OllamaChatClientService(@Qualifier("ollamaChatClient") ChatClient chatClient) {
+    public OpenApiChatClientService(@Qualifier("openAiChatClient") ChatClient chatClient) {
         this.chatClient = chatClient;
     }
 
