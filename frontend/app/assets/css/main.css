@@ -54,5 +54,6 @@
 .composer-character-count{min-width:48px;color:var(--faded);font:9px/1 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:.04em;text-align:right;white-space:nowrap}.composer-character-count.is-near-limit{color:var(--clay)}
 
 /* Right-aligned user prompts with a warm, neutral chat bubble. */
-.question{width:fit-content;max-width:72%;margin-left:auto;align-self:flex-end;align-items:flex-end}.question small{text-align:right}.question-bubble{padding:16px 24px;border:1px solid var(--sage);border-radius:22px;background:var(--fresh);color:var(--ink)}
-@media(max-width:640px){.question{max-width:88%}.question-bubble{padding:12px 16px;border-radius:18px}}
+.question{width:fit-content;max-width:72%;margin-left:auto;align-self:flex-end;align-items:flex-end}.question small{text-align:right}.question-bubble{padding:12px 18px;border:1px solid var(--sage);border-radius:22px;background:var(--fresh);color:var(--ink)}
+.composer{padding:12px}
+@media(max-width:640px){.question{max-width:88%}.question-bubble{padding:10px 14px;border-radius:18px}.composer{padding:10px}}
