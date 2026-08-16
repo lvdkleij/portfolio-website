@@ -142,8 +142,8 @@ async function scrollToMessage(messageId: string, target: 'prompt' | 'response',
 
   const scrollerRect = scroller.getBoundingClientRect();
   const anchorRect = anchor.getBoundingClientRect();
-  const composerClearance = window.innerWidth <= 640 ? 120 : 150;
-  const viewportTop = scrollerRect.top + 12;
+  const composerClearance = window.innerWidth <= 640 ? 220 : 260;
+  const viewportTop = scrollerRect.top + 28;
   const viewportBottom = scrollerRect.bottom - composerClearance;
   const currentTop = scroller.scrollTop;
 
@@ -152,7 +152,7 @@ async function scrollToMessage(messageId: string, target: 'prompt' | 'response',
 
   if (aboveViewport) {
     scroller.scrollTo({
-      top: Math.max(0, currentTop + (anchorRect.top - viewportTop)),
+      top: Math.max(0, currentTop + (anchorRect.top - viewportTop) - 18),
       behavior,
     });
     return;
@@ -160,7 +160,7 @@ async function scrollToMessage(messageId: string, target: 'prompt' | 'response',
 
   if (belowViewport) {
     scroller.scrollTo({
-      top: Math.max(0, currentTop + (anchorRect.bottom - viewportBottom)),
+      top: Math.max(0, currentTop + (anchorRect.bottom - viewportBottom) - 18),
       behavior,
     });
   }
@@ -190,11 +190,16 @@ async function runTurn(turn: GuestTurn) {
 
   await start(request);
 
-  if (followStream.value) scrollToMessage(turn.id, 'response', 'smooth');
+  if (followStream.value) {
+    await nextTick();
+    scrollToMessage(turn.id, 'response', 'smooth');
+  }
 }
 
 function sendMessage(submission: ChatSubmission) {
   if (active.value) return;
+
+  followStream.value = true;
 
   const attachment = pastedAttachment(submission.attachment);
   const id = createId('turn');
@@ -214,12 +219,13 @@ function sendMessage(submission: ChatSubmission) {
   });
 
   guestTurns.value.push(turn);
-  scrollToMessage(turn.id, 'prompt', 'smooth');
+  nextTick(() => scrollToMessage(turn.id, 'prompt', 'smooth'));
   void runTurn(turn);
 }
 
 function retryTurn(turn: GuestTurn) {
   if (active.value || turn !== guestTurns.value[guestTurns.value.length - 1]) return;
+  followStream.value = true;
   void runTurn(turn);
 }
 
