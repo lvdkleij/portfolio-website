@@ -8,7 +8,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   project_management_enabled    = true
   custom_subdomain_name         = "aif-portfolio-prod"
   local_auth_enabled            = false
-  public_network_access_enabled = false
+  public_network_access_enabled = true
 
 
   identity {
