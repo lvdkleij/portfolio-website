@@ -70,15 +70,15 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
   template {
     min_replicas               = 0
     max_replicas               = 1
-    cooldown_period_in_seconds = 60
+    cooldown_period_in_seconds = 120
 
     container {
       name = "backend"
       # 'image' is only used for initial creation of the container. 
       # Image updates happen in the backend-deploy.yml
       image  = "lakleij/portfolio-backend:latest"
-      cpu    = 0.25
-      memory = "0.5Gi"
+      cpu    = 0.5
+      memory = "1Gi"
     }
   }
 
