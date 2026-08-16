@@ -12,7 +12,7 @@ resource "azurerm_subnet" "snet_container_apps_prod" {
   address_prefixes     = ["10.0.1.0/24"]
 
   service_endpoint {
-    service = "Microsoft.CognitiveService"
+    service = "Microsoft.CognitiveServices"
   }
 
   delegation {
