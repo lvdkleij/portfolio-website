@@ -25,7 +25,7 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   template {
     min_replicas               = 0
     max_replicas               = 1
-    cooldown_period_in_seconds = 60
+    cooldown_period_in_seconds = 120
 
     container {
       name = "frontend"
@@ -61,7 +61,8 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
 
   ingress {
     external_enabled = false
-    target_port      = 80
+    target_port      = 8080
+    
     traffic_weight {
       percentage      = 100
       latest_revision = true
