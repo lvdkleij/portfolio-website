@@ -2619,7 +2619,6 @@ textarea::-webkit-scrollbar-thumb {
   border-radius: 22px;
   background: var(--fresh);
   color: var(--ink);
-  text-align: center;
 }
 .composer {
   padding: 8px;
