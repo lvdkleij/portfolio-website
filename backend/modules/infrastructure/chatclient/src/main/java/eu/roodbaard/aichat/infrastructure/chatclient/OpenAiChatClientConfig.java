@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ChatClientConfig {
+public class OpenAiChatClientConfig {
 
     @Bean
     public ChatClient openAiChatClient(OpenAiChatModel openAiChatModel) {
