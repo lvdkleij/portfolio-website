@@ -106,114 +106,114 @@ resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
 
 ### Custom Domain via Cloudflare
 
-resource "cloudflare_dns_record" "frontend_apex" {
-  zone_id = var.cloudflare_zone_id
-  name    = "@"
-  type    = "A"
-  content = azurerm_container_app_environment.cae_portfolio_prod.static_ip_address
-  ttl     = 1
-  proxied = true
-}
+# resource "cloudflare_dns_record" "frontend_apex" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "@"
+#   type    = "A"
+#   content = azurerm_container_app_environment.cae_portfolio_prod.static_ip_address
+#   ttl     = 1
+#   proxied = true
+# }
 
-resource "cloudflare_dns_record" "frontend_apex_verification" {
-  zone_id = var.cloudflare_zone_id
-  name    = "asuid"
-  type    = "TXT"
-  content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
-  ttl     = 300
-}
+# resource "cloudflare_dns_record" "frontend_apex_verification" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "asuid"
+#   type    = "TXT"
+#   content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
+#   ttl     = 300
+# }
 
-resource "azurerm_container_app_custom_domain" "frontend_apex" {
-  name             = var.domain_name
-  container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
+# resource "azurerm_container_app_custom_domain" "frontend_apex" {
+#   name             = var.domain_name
+#   container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
 
-  depends_on = [
-    cloudflare_dns_record.frontend_apex,
-    cloudflare_dns_record.frontend_apex_verification
-  ]
+#   depends_on = [
+#     cloudflare_dns_record.frontend_apex,
+#     cloudflare_dns_record.frontend_apex_verification
+#   ]
 
-  lifecycle {
-    ignore_changes = [
-      certificate_binding_type,
-      container_app_environment_certificate_id
-    ]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [
+#       certificate_binding_type,
+#       container_app_environment_certificate_id
+#     ]
+#   }
+# }
 
-resource "cloudflare_dns_record" "frontend_www" {
-  zone_id = var.cloudflare_zone_id
-  name    = "www"
-  type    = "CNAME"
-  content = azurerm_container_app.ca_portfolio_frontend_prod.ingress[0].fqdn
-  ttl     = 1
-  proxied = true
-}
+# resource "cloudflare_dns_record" "frontend_www" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "www"
+#   type    = "CNAME"
+#   content = azurerm_container_app.ca_portfolio_frontend_prod.ingress[0].fqdn
+#   ttl     = 1
+#   proxied = true
+# }
 
-resource "cloudflare_dns_record" "frontend_www_verification" {
-  zone_id = var.cloudflare_zone_id
-  name    = "asuid.www"
-  type    = "TXT"
-  content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
-  ttl     = 300
-}
+# resource "cloudflare_dns_record" "frontend_www_verification" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "asuid.www"
+#   type    = "TXT"
+#   content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
+#   ttl     = 300
+# }
 
-resource "azurerm_container_app_custom_domain" "frontend_www" {
-  name             = "www.${var.domain_name}"
-  container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
+# resource "azurerm_container_app_custom_domain" "frontend_www" {
+#   name             = "www.${var.domain_name}"
+#   container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
 
-  depends_on = [
-    cloudflare_dns_record.frontend_www,
-    cloudflare_dns_record.frontend_www_verification
-  ]
+#   depends_on = [
+#     cloudflare_dns_record.frontend_www,
+#     cloudflare_dns_record.frontend_www_verification
+#   ]
 
-  lifecycle {
-    ignore_changes = [
-      certificate_binding_type,
-      container_app_environment_certificate_id
-    ]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [
+#       certificate_binding_type,
+#       container_app_environment_certificate_id
+#     ]
+#   }
+# }
 
-resource "azurerm_container_app_environment_managed_certificate" "frontend_apex" {
-  name                         = "mc-portfolio-frontend-apex"
-  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
-  subject_name                 = var.domain_name
-  domain_control_validation    = "HTTP"
+# resource "azurerm_container_app_environment_managed_certificate" "frontend_apex" {
+#   name                         = "mc-portfolio-frontend-apex"
+#   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+#   subject_name                 = var.domain_name
+#   domain_control_validation    = "HTTP"
 
-  depends_on = [
-    azurerm_container_app_custom_domain.frontend_apex
-  ]
-}
+#   depends_on = [
+#     azurerm_container_app_custom_domain.frontend_apex
+#   ]
+# }
 
-resource "azurerm_container_app_environment_managed_certificate" "frontend_www" {
-  name                         = "mc-portfolio-frontend-www"
-  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
-  subject_name                 = "www.${var.domain_name}"
-  domain_control_validation    = "CNAME"
+# resource "azurerm_container_app_environment_managed_certificate" "frontend_www" {
+#   name                         = "mc-portfolio-frontend-www"
+#   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+#   subject_name                 = "www.${var.domain_name}"
+#   domain_control_validation    = "CNAME"
 
-  depends_on = [
-    azurerm_container_app_custom_domain.frontend_www
-  ]
-}
+#   depends_on = [
+#     azurerm_container_app_custom_domain.frontend_www
+#   ]
+# }
 
-resource "cloudflare_zone_setting" "ssl" {
-  zone_id    = var.cloudflare_zone_id
-  setting_id = "ssl"
-  value      = "strict"
-}
+# resource "cloudflare_zone_setting" "ssl" {
+#   zone_id    = var.cloudflare_zone_id
+#   setting_id = "ssl"
+#   value      = "strict"
+# }
 
-resource "cloudflare_universal_ssl_setting" "portfolio" {
-  zone_id = var.cloudflare_zone_id
-  enabled = true
-}
+# resource "cloudflare_universal_ssl_setting" "portfolio" {
+#   zone_id = var.cloudflare_zone_id
+#   enabled = true
+# }
 
 
-variable "domain_name" {
-  type    = string
-  default = "lucasvanderkleij.dev"
-}
+# variable "domain_name" {
+#   type    = string
+#   default = "lucasvanderkleij.dev"
+# }
 
-variable "cloudflare_zone_id" {
-  type      = string
-  sensitive = true
-}
+# variable "cloudflare_zone_id" {
+#   type      = string
+#   sensitive = true
+# }
