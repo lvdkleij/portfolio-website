@@ -5,18 +5,22 @@ resource "azurerm_container_app_environment" "cae_portfolio_prod" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.log_portfolio_prod.id
   logs_destination           = "log-analytics"
   infrastructure_subnet_id   = azurerm_subnet.snet_container_apps_prod.id
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
-resource "azurerm_role_assignment" "container_apps_key_vault_secrets" {
-  scope                = azurerm_key_vault.kv_portfolio_prod.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id = (
-    azurerm_container_app_environment
-    .cae_portfolio_prod
-    .identity[0]
-    .principal_id
-  )
-}
+# resource "azurerm_role_assignment" "container_apps_key_vault_secrets" {
+#   scope                = azurerm_key_vault.kv_portfolio_prod.id
+#   role_definition_name = "Key Vault Secrets User"
+#   principal_id = (
+#     azurerm_container_app_environment
+#     .cae_portfolio_prod
+#     .identity[0]
+#     .principal_id
+#   )
+# }
 
 ##################
 ##################
