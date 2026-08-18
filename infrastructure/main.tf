@@ -10,3 +10,15 @@ resource "azurerm_log_analytics_workspace" "log_portfolio_prod" {
   retention_in_days   = 30
 }
 
+resource "azurerm_key_vault" "kv_portfolio_prod" {
+  name                        = "kv-portfolio-prod"
+  location                    = data.azurerm_resource_group.example.location
+  resource_group_name         = data.azurerm_resource_group.example.name
+  rbac_authorization_enabled  = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+}
