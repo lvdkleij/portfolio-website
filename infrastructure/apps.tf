@@ -12,9 +12,9 @@ resource "azurerm_role_assignment" "container_apps_key_vault_secrets" {
   role_definition_name = "Key Vault Secrets User"
   principal_id = (
     azurerm_container_app_environment
-      .cae_portfolio_prod
-      .identity[0]
-      .principal_id
+    .cae_portfolio_prod
+    .identity[0]
+    .principal_id
   )
 }
 
