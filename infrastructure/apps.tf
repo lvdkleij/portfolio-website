@@ -5,53 +5,30 @@ resource "azurerm_container_app_environment" "cae_portfolio_prod" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.log_portfolio_prod.id
   logs_destination           = "log-analytics"
   infrastructure_subnet_id   = azurerm_subnet.snet_container_apps_prod.id
-}
 
-resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
-  name                         = "ca-portfolio-frontend-prod"
-  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
-  resource_group_name          = data.azurerm_resource_group.rg_portfolio_prod.name
-  revision_mode                = "Single"
-
-  ingress {
-    external_enabled = true
-    target_port      = 8080
-    traffic_weight {
-      percentage      = 100
-      latest_revision = true
-    }
-  }
-
-  template {
-    min_replicas               = 0
-    max_replicas               = 1
-    cooldown_period_in_seconds = 120
-
-    container {
-      name = "frontend"
-      # 'image' is only used for initial creation of the container. 
-      # Image updates happen in the frontend-deploy.yml
-      image  = "lakleij/portfolio-frontend:latest"
-      cpu    = 0.25
-      memory = "0.5Gi"
-
-      env {
-        # Because the backend and frontend Container Apps share the same environment,
-        # the frontend can privately reach the backend through its internal ingress.
-        name  = "BACKEND_BASE_URL"
-        value = "http://ca-portfolio-backend-prod"
-      }
-    }
-  }
-
-
-
-  lifecycle {
-    ignore_changes = [
-      template[0].container[0].image
-    ]
+  identity {
+    type = "SystemAssigned"
   }
 }
+
+# resource "azurerm_role_assignment" "container_apps_key_vault_secrets" {
+#   scope                = azurerm_key_vault.kv_portfolio_prod.id
+#   role_definition_name = "Key Vault Secrets User"
+#   principal_id = (
+#     azurerm_container_app_environment
+#     .cae_portfolio_prod
+#     .identity[0]
+#     .principal_id
+#   )
+# }
+
+##################
+##################
+####
+#### Backend App
+####
+##################
+##################
 
 resource "azurerm_container_app" "ca_portfolio_backend_prod" {
   name                         = "ca-portfolio-backend-prod"
@@ -96,7 +73,6 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
 }
 
 
-
 resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
   scope = azurerm_cognitive_account.aif_portfolio_prod.id
   # or? "Foundry Agent Consumer"
@@ -104,8 +80,98 @@ resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
   principal_id         = azurerm_container_app.ca_portfolio_backend_prod.identity[0].principal_id
 }
 
+##################
+##################
+####
+#### Frontend App
+####
+##################
+##################
 
-### Custom Domain via Cloudflare
+resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
+  name                         = "ca-portfolio-frontend-prod"
+  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+  resource_group_name          = data.azurerm_resource_group.rg_portfolio_prod.name
+  revision_mode                = "Single"
+
+  ingress {
+    external_enabled = true
+    target_port      = 8080
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
+    }
+  }
+
+  template {
+    min_replicas               = 0
+    max_replicas               = 1
+    cooldown_period_in_seconds = 120
+
+    container {
+      name = "frontend"
+      # 'image' is only used for initial creation of the container. 
+      # Image updates happen in the frontend-deploy.yml
+      image  = "lakleij/portfolio-frontend:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
+
+      env {
+        # Because the backend and frontend Container Apps share the same environment,
+        # the frontend can privately reach the backend through its internal ingress.
+        name  = "BACKEND_BASE_URL"
+        value = "http://ca-portfolio-backend-prod"
+      }
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      template[0].container[0].image
+    ]
+  }
+}
+
+
+
+# ### Custom Domain via Cloudflare
+
+# locals {
+#   cloudflare_origin_certificate_name = "cloudflare-origin-frontend"
+
+#   cloudflare_origin_certificate_secret_id = format(
+#     "%s/secrets/%s",
+#     trimsuffix(azurerm_key_vault.kv_portfolio_prod.vault_uri, "/"),
+#     local.cloudflare_origin_certificate_name
+#   )
+# }
+
+# resource "azurerm_container_app_environment_certificate" "frontend_origin" {
+#   name                         = "cloudflare-origin-frontend"
+#   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+
+#   certificate_key_vault {
+#     identity            = "System"
+#     key_vault_secret_id = local.cloudflare_origin_certificate_secret_id
+#   }
+
+#   depends_on = [
+#     azurerm_role_assignment.container_apps_key_vault_secrets
+#   ]
+# }
+
+
+# # 
+
+# variable "domain_name" {
+#   type    = string
+#   default = "lucasvanderkleij.dev"
+# }
+
+# variable "cloudflare_zone_id" {
+#   type      = string
+#   sensitive = true
+# }
 
 # resource "cloudflare_dns_record" "frontend_apex" {
 #   zone_id = var.cloudflare_zone_id
@@ -127,18 +193,13 @@ resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
 # resource "azurerm_container_app_custom_domain" "frontend_apex" {
 #   name             = var.domain_name
 #   container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
+#   container_app_environment_certificate_id = azurerm_container_app_environment.cae_portfolio_prod.id
+#   certificate_binding_type                 = "SniEnabled"
 
 #   depends_on = [
 #     cloudflare_dns_record.frontend_apex,
 #     cloudflare_dns_record.frontend_apex_verification
 #   ]
-
-#   lifecycle {
-#     ignore_changes = [
-#       certificate_binding_type,
-#       container_app_environment_certificate_id
-#     ]
-#   }
 # }
 
 # resource "cloudflare_dns_record" "frontend_www" {
@@ -150,71 +211,60 @@ resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
 #   proxied = true
 # }
 
-# resource "cloudflare_dns_record" "frontend_www_verification" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "asuid.www"
-#   type    = "TXT"
-#   content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
-#   ttl     = 300
-# }
+# # resource "cloudflare_dns_record" "frontend_www_verification" {
+# #   zone_id = var.cloudflare_zone_id
+# #   name    = "asuid.www"
+# #   type    = "TXT"
+# #   content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
+# #   ttl     = 300
+# # }
 
-# resource "azurerm_container_app_custom_domain" "frontend_www" {
-#   name             = "www.${var.domain_name}"
-#   container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
+# # resource "azurerm_container_app_custom_domain" "frontend_www" {
+# #   name             = "www.${var.domain_name}"
+# #   container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
 
-#   depends_on = [
-#     cloudflare_dns_record.frontend_www,
-#     cloudflare_dns_record.frontend_www_verification
-#   ]
+# #   depends_on = [
+# #     cloudflare_dns_record.frontend_www,
+# #     cloudflare_dns_record.frontend_www_verification
+# #   ]
 
-#   lifecycle {
-#     ignore_changes = [
-#       certificate_binding_type,
-#       container_app_environment_certificate_id
-#     ]
-#   }
-# }
+# #   lifecycle {
+# #     ignore_changes = [
+# #       certificate_binding_type,
+# #       container_app_environment_certificate_id
+# #     ]
+# #   }
+# # }
 
-# resource "azurerm_container_app_environment_managed_certificate" "frontend_apex" {
-#   name                         = "mc-portfolio-frontend-apex"
-#   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
-#   subject_name                 = var.domain_name
-#   domain_control_validation    = "HTTP"
+# # resource "azurerm_container_app_environment_managed_certificate" "frontend_apex" {
+# #   name                         = "mc-portfolio-frontend-apex"
+# #   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+# #   subject_name                 = var.domain_name
+# #   domain_control_validation    = "HTTP"
 
-#   depends_on = [
-#     azurerm_container_app_custom_domain.frontend_apex
-#   ]
-# }
+# #   depends_on = [
+# #     azurerm_container_app_custom_domain.frontend_apex
+# #   ]
+# # }
 
-# resource "azurerm_container_app_environment_managed_certificate" "frontend_www" {
-#   name                         = "mc-portfolio-frontend-www"
-#   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
-#   subject_name                 = "www.${var.domain_name}"
-#   domain_control_validation    = "CNAME"
+# # resource "azurerm_container_app_environment_managed_certificate" "frontend_www" {
+# #   name                         = "mc-portfolio-frontend-www"
+# #   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+# #   subject_name                 = "www.${var.domain_name}"
+# #   domain_control_validation    = "CNAME"
 
-#   depends_on = [
-#     azurerm_container_app_custom_domain.frontend_www
-#   ]
-# }
+# #   depends_on = [
+# #     azurerm_container_app_custom_domain.frontend_www
+# #   ]
+# # }
 
-# resource "cloudflare_zone_setting" "ssl" {
-#   zone_id    = var.cloudflare_zone_id
-#   setting_id = "ssl"
-#   value      = "strict"
-# }
+# # resource "cloudflare_zone_setting" "ssl" {
+# #   zone_id    = var.cloudflare_zone_id
+# #   setting_id = "ssl"
+# #   value      = "strict"
+# # }
 
-# resource "cloudflare_universal_ssl_setting" "portfolio" {
-#   zone_id = var.cloudflare_zone_id
-#   enabled = true
-# }
-
-
-# variable "domain_name" {
-#   type    = string
-#   default = "lucasvanderkleij.dev"
-# }
-
-# variable "cloudflare_zone_id" {
-#   type      = string
-#   sensitive = true
-# }
+# # resource "cloudflare_universal_ssl_setting" "portfolio" {
+# #   zone_id = var.cloudflare_zone_id
+# #   enabled = true
+# # }
