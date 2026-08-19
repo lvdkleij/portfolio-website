@@ -25,8 +25,8 @@ resource "azurerm_key_vault" "kv_portfolio_prod" {
   sku_name = "standard"
 
   network_acls {
-    default_action = "Deny"
+    default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.snet_container_apps_prod.id]
-    bypass = "None"
+    bypass                     = "None"
   }
 }
