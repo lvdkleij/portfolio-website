@@ -18,7 +18,7 @@ resource "azurerm_subnet" "snet_container_apps_prod" {
   service_endpoint {
     service = "Microsoft.KeyVault"
   }
-  
+
   delegation {
     name = "container-apps"
 
