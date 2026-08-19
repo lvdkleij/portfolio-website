@@ -134,29 +134,29 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
 
 # ### Custom Domain via Cloudflare
 
-# locals {
-#   cloudflare_origin_certificate_name = "cloudflare-origin-frontend"
+locals {
+  cloudflare_origin_certificate_name = "cloudflare-origin-frontend"
 
-#   cloudflare_origin_certificate_secret_id = format(
-#     "%s/secrets/%s",
-#     trimsuffix(azurerm_key_vault.kv_portfolio_prod.vault_uri, "/"),
-#     local.cloudflare_origin_certificate_name
-#   )
-# }
+  cloudflare_origin_certificate_secret_id = format(
+    "%s/secrets/%s",
+    trimsuffix(azurerm_key_vault.kv_portfolio_prod.vault_uri, "/"),
+    local.cloudflare_origin_certificate_name
+  )
+}
 
-# resource "azurerm_container_app_environment_certificate" "frontend_origin" {
-#   name                         = "cloudflare-origin-frontend"
-#   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
+resource "azurerm_container_app_environment_certificate" "frontend_origin" {
+  name                         = "cloudflare-origin-frontend"
+  container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
 
-#   certificate_key_vault {
-#     identity            = "System"
-#     key_vault_secret_id = local.cloudflare_origin_certificate_secret_id
-#   }
+  certificate_key_vault {
+    identity            = "System"
+    key_vault_secret_id = local.cloudflare_origin_certificate_secret_id
+  }
 
-#   depends_on = [
-#     azurerm_role_assignment.container_apps_key_vault_secrets
-#   ]
-# }
+  depends_on = [
+    azurerm_role_assignment.container_apps_key_vault_secrets
+  ]
+}
 
 
 # # 
