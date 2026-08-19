@@ -73,7 +73,7 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
 }
 
 resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
-  scope = azurerm_cognitive_account.aif_portfolio_prod.id
+  scope                = azurerm_cognitive_account.aif_portfolio_prod.id
   role_definition_name = "Cognitive Services User"
   principal_id         = azurerm_container_app.ca_portfolio_backend_prod.identity[0].principal_id
 }
