@@ -15,6 +15,10 @@ resource "azurerm_subnet" "snet_container_apps_prod" {
     service = "Microsoft.CognitiveServices"
   }
 
+  service_endpoint {
+    service = "Microsoft.KeyVault"
+  }
+
   delegation {
     name = "container-apps"
 
