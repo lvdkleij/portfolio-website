@@ -14,6 +14,11 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   identity {
     type = "SystemAssigned"
   }
+
+  network_acls {
+    bypass         = "None"
+    default_action = "Allow"
+  }
 }
 
 resource "azurerm_cognitive_account_project" "aif_proj_portfolio_prod" {
