@@ -16,7 +16,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   }
 
   network_acls {
-    bypass = "None"
+    bypass         = "None"
     default_action = "Allow"
   }
 }
