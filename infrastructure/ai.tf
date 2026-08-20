@@ -16,12 +16,7 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
     type = "SystemAssigned"
   }
 
-  network_acls {
-    default_action = "Deny"
-    virtual_network_rules {
-      subnet_id = azurerm_subnet.snet_container_apps_prod.id
-    }
-  }
+
 }
 
 
