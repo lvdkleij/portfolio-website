@@ -10,9 +10,9 @@ resource "azurerm_container_app_environment" "cae_portfolio_prod" {
   }
 }
 
-resource "azurerm_role_assignment" "container_apps_key_vault_certificates" {
+resource "azurerm_role_assignment" "container_apps_key_vault_secrets" {
   scope                = azurerm_key_vault.kv_portfolio_prod.id
-  role_definition_name = "Key Vault Certificate User"
+  role_definition_name = "Key Vault Secrets User"
   principal_id = (
     azurerm_container_app_environment
     .cae_portfolio_prod
@@ -153,7 +153,7 @@ resource "azurerm_container_app_environment_certificate" "frontend_origin" {
   }
 
   depends_on = [
-    azurerm_role_assignment.container_apps_key_vault_certificates
+    azurerm_role_assignment.container_apps_key_vault_secrets
   ]
 }
 
