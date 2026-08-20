@@ -33,4 +33,9 @@ resource "azurerm_key_vault" "kv_portfolio_prod" {
   public_network_access_enabled = true
 
   sku_name = "standard"
+
+  network_acls {
+    bypass         = "None"
+    default_action = "Allow"
+  }
 }
