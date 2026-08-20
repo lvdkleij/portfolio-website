@@ -1,6 +1,6 @@
 resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   #checkov:skip=CKV2_AZURE_22: Microsoft-managed encryption is sufficient for this non-regulated portfolio workload.
-  #checkov:skip=CKV_AZURE_134: Is behind vnet
+  #checkov:skip=CKV_AZURE_134: The backend needs the public endpoint because it no longer uses a VNet. API keys are disabled, and access requires Entra ID and RBAC.
   name                          = "aif-portfolio-prod"
   location                      = data.azurerm_resource_group.rg_portfolio_prod.location
   resource_group_name           = data.azurerm_resource_group.rg_portfolio_prod.name
@@ -11,14 +11,10 @@ resource "azurerm_cognitive_account" "aif_portfolio_prod" {
   local_auth_enabled            = false
   public_network_access_enabled = true
 
-
   identity {
     type = "SystemAssigned"
   }
-
-
 }
-
 
 resource "azurerm_cognitive_account_project" "aif_proj_portfolio_prod" {
   name                 = "aif_proj_portfolio_prod"
@@ -46,7 +42,7 @@ resource "azurerm_cognitive_deployment" "aif_cd_portfolio_prod" {
     name     = "GlobalStandard"
     capacity = 1
   }
-  dynamic_throttling_enabled = false
 
-  version_upgrade_option = "NoAutoUpgrade"
+  dynamic_throttling_enabled = false
+  version_upgrade_option     = "NoAutoUpgrade"
 }
