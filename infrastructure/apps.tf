@@ -190,9 +190,9 @@ resource "cloudflare_dns_record" "frontend_chat_verification" {
 
 resource "azurerm_container_app_custom_domain" "frontend_chat" {
   name             = "chat.${var.domain_name}"
-  container_app_id = azurerm_container_app_environment.cae_portfolio_prod.id
+  container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
   container_app_environment_certificate_id = (
-    azurerm_container_app.ca_portfolio_frontend_prod.frontend_origin.id
+    azurerm_container_app_environment_certificate.frontend_origin.id
   )
   certificate_binding_type = "SniEnabled"
 
