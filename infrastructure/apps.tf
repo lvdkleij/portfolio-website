@@ -207,7 +207,7 @@ resource "cloudflare_bot_management" "strict" {
   fight_mode = true
 
   ai_bots_protection      = "block"
-  content_bots_protection = "block"
+  content_bots_protection = "disabled"
   crawler_protection      = "enabled"
 
   enable_js = true

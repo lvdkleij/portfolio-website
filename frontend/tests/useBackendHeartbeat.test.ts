@@ -47,6 +47,44 @@ describe('useBackendHeartbeat', () => {
     expect(fetcher).toHaveBeenCalledTimes(3)
   })
 
+  it('stays connecting after an initial failure and becomes ready on retry', async () => {
+    let attempts = 0
+    const fetcher = vi.fn(async () => {
+      attempts += 1
+      if (attempts === 1) throw new Error('Backend is still starting')
+      return new Response(null, { status: 204 })
+    })
+
+    mountHeartbeat(fetcher)
+    await vi.advanceTimersByTimeAsync(0)
+
+    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(wrapper?.text()).toBe('connecting')
+
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(fetcher).toHaveBeenCalledTimes(2)
+    expect(wrapper?.text()).toBe('ready')
+  })
+
+  it('stays ready when a periodic heartbeat fails', async () => {
+    let attempts = 0
+    const fetcher = vi.fn(async () => {
+      attempts += 1
+      if (attempts === 2) throw new Error('Transient heartbeat failure')
+      return new Response(null, { status: 204 })
+    })
+
+    mountHeartbeat(fetcher)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(wrapper?.text()).toBe('ready')
+
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(fetcher).toHaveBeenCalledTimes(2)
+    expect(wrapper?.text()).toBe('ready')
+  })
+
   it('stops after ten minutes without activity and activity restarts it immediately', async () => {
     const fetcher = vi.fn(async () => new Response(null, { status: 204 }))
     mountHeartbeat(fetcher)

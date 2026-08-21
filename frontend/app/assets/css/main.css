@@ -176,12 +176,12 @@ textarea:focus-visible {
   animation: availability-pulse 1.6s ease-in-out infinite;
 }
 .agent-availability[data-state='stopped'] {
-  border-color: var(--clay);
-  background: var(--clay-soft);
-  color: var(--clay);
+  border-color: var(--sage);
+  background: var(--fresh);
+  color: var(--faded);
 }
 .agent-availability[data-state='stopped'] .dot {
-  background: var(--clay);
+  background: var(--sage);
 }
 @keyframes availability-pulse {
   0%,
