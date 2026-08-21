@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/": {
+      "targetKind": "existing-ui",
+      "projectId": "0817ca8a-a30e-40e8-b16a-35514a27ab52",
+      "baselineDraftId": "48e54cc2-eaf7-4695-b0ed-af1bb21777d1",
+      "activeDraftId": "fd536dc8-9ad8-4a7b-a622-3910dffe9f18",
+      "designSystemPath": ".superdesign/design-system.md",
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "frontend/app/app.vue",
+        "frontend/app/components/AppHeader.vue",
+        "frontend/app/components/SystemContextRail.vue",
+        "frontend/app/composables/useBackendHeartbeat.ts",
+        "frontend/app/assets/css/main.css:1:195",
+        "frontend/app/assets/css/main.css:617:700",
+        "frontend/app/assets/css/main.css:852:950",
+        "frontend/app/assets/css/main.css:1200:1305"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "567deab23b3d48d080d58ba41ffbeeac625ba8e8555ee06142b0e7b51b09ae00",
+        "frontend/app/app.vue": "a06202895c53dff671b075d7b6f3b953dcd49d5093f0e1ea64a8007d1fc116a7",
+        "frontend/app/components/AppHeader.vue": "d206bfc40d10abed033ae0e76e0a607f925cb36970631ee5e248103b1e2c87f6",
+        "frontend/app/components/SystemContextRail.vue": "31283241a40ca327b56039bf15b8f8ab9a3258db05f818ed8aa502a35c8bcbec",
+        "frontend/app/composables/useBackendHeartbeat.ts": "bcbcca3fd33bc868b8065b01e8fd8b30307843d036a52fb19e2a81f246165bc4",
+        "frontend/app/assets/css/main.css": "9b0983111558b76b96f6e6913495899857bc17fe2b3abb598b32ec25f7b1e1d7"
+      },
+      "components": [
+        {
+          "name": "AppHeader",
+          "id": "1f68c055-c82e-4ee5-8da1-d35eb8d46830",
+          "sourcePath": "frontend/app/components/AppHeader.vue"
+        },
+        {
+          "name": "SystemContextRail",
+          "id": "2ba6cdad-db87-4849-a394-820cb8db7d05",
+          "sourcePath": "frontend/app/components/SystemContextRail.vue"
+        }
+      ],
+      "drafts": {
+        "fd536dc8-9ad8-4a7b-a622-3910dffe9f18": {
+          "title": "Lucas Studio — Header Availability Status",
+          "visualDirection": "Editorial header badge with heartbeat availability states",
+          "parentDraftId": "a3619462-2167-4525-8140-aa867873b039",
+          "currentVersion": 4
+        }
+      },
+      "updatedAt": "2026-08-21T07:01:53Z"
+    }
+  }
+}
