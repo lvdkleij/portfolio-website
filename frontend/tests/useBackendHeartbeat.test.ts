@@ -9,8 +9,8 @@ let visibilityState: DocumentVisibilityState
 function mountHeartbeat(fetcher: typeof fetch) {
   wrapper = mount(defineComponent({
     setup() {
-      useBackendHeartbeat({ fetcher })
-      return () => h('div')
+      const heartbeat = useBackendHeartbeat({ fetcher })
+      return () => h('div', heartbeat.state.value)
     }
   }))
 }
@@ -40,6 +40,7 @@ describe('useBackendHeartbeat', () => {
     await vi.advanceTimersByTimeAsync(0)
 
     expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(wrapper?.text()).toBe('ready')
     expect(fetcher).toHaveBeenLastCalledWith('/api/heartbeat', expect.objectContaining({ method: 'POST' }))
 
     await vi.advanceTimersByTimeAsync(2 * 60_000)
@@ -52,12 +53,14 @@ describe('useBackendHeartbeat', () => {
     await vi.advanceTimersByTimeAsync(10 * 60_000)
 
     expect(fetcher).toHaveBeenCalledTimes(10)
+    expect(wrapper?.text()).toBe('stopped')
     await vi.advanceTimersByTimeAsync(5 * 60_000)
     expect(fetcher).toHaveBeenCalledTimes(10)
 
     document.dispatchEvent(new PointerEvent('pointerdown'))
     await vi.advanceTimersByTimeAsync(0)
     expect(fetcher).toHaveBeenCalledTimes(11)
+    expect(wrapper?.text()).toBe('ready')
 
     await vi.advanceTimersByTimeAsync(60_000)
     expect(fetcher).toHaveBeenCalledTimes(12)
@@ -84,12 +87,15 @@ describe('useBackendHeartbeat', () => {
     await vi.advanceTimersByTimeAsync(0)
 
     setVisibility('hidden')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(wrapper?.text()).toBe('stopped')
     await vi.advanceTimersByTimeAsync(2 * 60_000)
     expect(fetcher).toHaveBeenCalledTimes(1)
 
     setVisibility('visible')
     await vi.advanceTimersByTimeAsync(0)
     expect(fetcher).toHaveBeenCalledTimes(2)
+    expect(wrapper?.text()).toBe('ready')
 
     setVisibility('hidden')
     await vi.advanceTimersByTimeAsync(11 * 60_000)
@@ -110,6 +116,7 @@ describe('useBackendHeartbeat', () => {
     await vi.advanceTimersByTimeAsync(2 * 60_000)
 
     expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(wrapper?.text()).toBe('connecting')
     const signal = fetcher.mock.calls[0]?.[1]?.signal
     wrapper?.unmount()
     wrapper = undefined

@@ -1,21 +1,22 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import type { BackendHeartbeatState } from '~/composables/useBackendHeartbeat'
 import type { ChatRuntimeContext } from '~/types/chat'
 
 const props = defineProps<{
   open: boolean
   runtime?: ChatRuntimeContext | null
+  agentState: BackendHeartbeatState
 }>()
 
 defineEmits<{ close: [] }>()
 
 const tools = computed(() => props.runtime?.trace.filter(stage => stage.kind === 'tool') ?? [])
 const stateLabel = computed(() => {
-  if (!props.runtime || props.runtime.state === 'idle') return 'Awaiting chat'
-  if (props.runtime.state === 'connecting') return 'Connecting'
-  if (props.runtime.state === 'streaming') return 'Streaming'
-  if (props.runtime.state === 'complete') return 'Ready'
-  if (props.runtime.state === 'cancelled') return 'Stopped'
-  return 'Unavailable'
+  if (props.runtime?.state === 'streaming') return 'Streaming'
+  if (props.runtime?.state === 'connecting' || props.agentState === 'connecting') return 'Waking up AI assistant…'
+  if (props.agentState === 'ready') return 'Ready'
+  return 'Assistant paused'
 })
 </script>
 
