@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ChatRequest } from '~/types/chat'
 import { useChatStream } from '~/composables/useChatStream'
+import { renderSafeMarkdown } from '~/utils/markdown'
 
 const request: ChatRequest = {
   clientRequestId: 'request-1',
@@ -45,7 +46,7 @@ describe('useChatStream', () => {
     expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toEqual(request)
   })
 
-  it('updates the response before the stream finishes', async () => {
+  it('accumulates and renders Markdown split across stream deltas', async () => {
     const encoder = new TextEncoder()
     let streamController: ReadableStreamDefaultController<Uint8Array> | undefined
     const response = new Response(new ReadableStream<Uint8Array>({
@@ -59,17 +60,33 @@ describe('useChatStream', () => {
     })
 
     const pending = chat.start(request)
-    streamController?.enqueue(encoder.encode('event: delta\ndata: {"type":"delta","text":"First"}\n\n'))
+    streamController?.enqueue(encoder.encode([
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: 'Intro.\n\n## Res' })}`,
+      '',
+      ''
+    ].join('\n')))
 
-    await vi.waitFor(() => expect(chat.responseText.value).toBe('First'))
+    await vi.waitFor(() => expect(chat.responseText.value).toBe('Intro.\n\n## Res'))
     expect(chat.state.value).toBe('streaming')
+    expect(renderSafeMarkdown(chat.responseText.value)).not.toContain('<script')
 
-    streamController?.enqueue(encoder.encode('event: delta\ndata: {"type":"delta","text":" second"}\n\n'))
+    streamController?.enqueue(encoder.encode([
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: 'ponse\n\nA **formatted' })}`,
+      '',
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: '** answer.' })}`,
+      '',
+      ''
+    ].join('\n')))
     streamController?.enqueue(encoder.encode('event: done\ndata: {"type":"done"}\n\n'))
     streamController?.close()
     await pending
 
-    expect(chat.responseText.value).toBe('First second')
+    expect(chat.responseText.value).toBe('Intro.\n\n## Response\n\nA **formatted** answer.')
+    expect(renderSafeMarkdown(chat.responseText.value)).toContain('<h2>Response</h2>')
+    expect(renderSafeMarkdown(chat.responseText.value)).toContain('<strong>formatted</strong>')
     expect(chat.state.value).toBe('complete')
   })
 
