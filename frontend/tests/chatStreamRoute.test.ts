@@ -86,7 +86,7 @@ afterEach(() => {
 
 describe('chat stream server route', () => {
   it('streams the latest user message from the private backend', async () => {
-    const source = encoder.encode('data:Hello 👋\n\ndata: café\n\n')
+    const source = encoder.encode('data:Hello 👋\n\ndata:café\n\n')
     const fetcher = vi.fn(async () => springSseResponse(Array.from(source, byte => Uint8Array.of(byte))))
     const { handler, output } = await loadHandler({ fetcher })
     const testEvent = event()
@@ -117,6 +117,20 @@ describe('chat stream server route', () => {
       'Content-Type': 'text/event-stream; charset=utf-8',
       'X-Accel-Buffering': 'no'
     })
+  })
+
+  it('preserves leading whitespace in Spring token chunks', async () => {
+    const fetcher = vi.fn(async () => springSseResponse([
+      encoder.encode('data:My\n\ndata: purpose\n\ndata: is\n\n')
+    ]))
+    const { handler, output } = await loadHandler({ fetcher })
+
+    await handler(event())
+
+    const streamed = new TextDecoder().decode(Buffer.concat(output))
+    expect(streamed).toContain('{"type":"delta","text":"My"}')
+    expect(streamed).toContain('{"type":"delta","text":" purpose"}')
+    expect(streamed).toContain('{"type":"delta","text":" is"}')
   })
 
   it('does not emit done when the upstream stream fails', async () => {

@@ -23,7 +23,7 @@ function eventData(block: string) {
   const dataLines = block
     .split(/\r\n|\r|\n/)
     .filter(line => line === 'data' || line.startsWith('data:'))
-    .map(line => line.startsWith('data: ') ? line.slice(6) : line.slice(5))
+    .map(line => line.slice(5))
 
   return dataLines.length > 0 ? dataLines.join('\n') : undefined
 }

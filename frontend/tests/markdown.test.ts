@@ -2,6 +2,31 @@ import { describe, expect, it } from 'vitest'
 import { renderSafeMarkdown } from '~/utils/markdown'
 
 describe('Markdown rendering', () => {
+  it('renders the response structures supported by the chat UI', () => {
+    const rendered = renderSafeMarkdown([
+      'Introductory paragraph.',
+      '',
+      '## Response',
+      '',
+      'A paragraph with **strong emphasis** and [a source](https://example.com).',
+      '',
+      '- First item',
+      '- Second item',
+      '',
+      '```ts',
+      'const streaming = true',
+      '```'
+    ].join('\n'))
+
+    expect(rendered).toContain('<h2>Response</h2>')
+    expect(rendered).toContain('<p>A paragraph with <strong>strong emphasis</strong>')
+    expect(rendered).toContain('<ul>')
+    expect(rendered).toContain('<li>First item</li>')
+    expect(rendered).toContain('<a href="https://example.com"')
+    expect(rendered).toContain('<pre><code')
+    expect(rendered).toContain('const streaming = true\n</code></pre>')
+  })
+
   it('renders Markdown while removing unsafe HTML and URL schemes', () => {
     const rendered = renderSafeMarkdown([
       '**Safe content**',
@@ -21,5 +46,21 @@ describe('Markdown rendering', () => {
 
   it('does not permit raw HTML', () => {
     expect(renderSafeMarkdown('<strong onclick="alert(1)">hello</strong>')).not.toContain('<strong')
+  })
+
+  it('keeps incomplete streamed Markdown safe at every stage', () => {
+    const fragments = [
+      '## Res',
+      'ponse\n\n**still streaming',
+      '\n\n<script>alert(1)</scr'
+    ]
+    let accumulated = ''
+
+    for (const fragment of fragments) {
+      accumulated += fragment
+      const rendered = renderSafeMarkdown(accumulated)
+      expect(rendered).not.toContain('<script')
+      expect(rendered).not.toContain('onclick=')
+    }
   })
 })
