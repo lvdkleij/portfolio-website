@@ -217,10 +217,10 @@ resource "cloudflare_bot_management" "strict" {
 }
 
 resource "cloudflare_ruleset" "country_allowlist" {
-  zone_id    = var.cloudflare_zone_id
-  name       = "Country allowlist"
-  kind       = "zone"
-  phase      = "http_request_firewall_custom"
+  zone_id     = var.cloudflare_zone_id
+  name        = "Country allowlist"
+  kind        = "zone"
+  phase       = "http_request_firewall_custom"
   description = "Only permit traffic from approved Western European countries"
 
   rules = [{
