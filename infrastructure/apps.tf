@@ -85,6 +85,30 @@ resource "azurerm_role_assignment" "backend_foundry_agent_consumer" {
 ##################
 ##################
 
+locals {
+  # Azure Container Apps ingress restrictions currently accept IPv4 CIDRs only.
+  # Keep this list synchronized with https://www.cloudflare.com/ips-v4/.
+  # Because every rule is an Allow rule, Azure implicitly denies all other
+  # sources, including direct access through the Container App's default FQDN.
+  cloudflare_ipv4_cidrs = {
+    cloudflare_ipv4_01 = "173.245.48.0/20"
+    cloudflare_ipv4_02 = "103.21.244.0/22"
+    cloudflare_ipv4_03 = "103.22.200.0/22"
+    cloudflare_ipv4_04 = "103.31.4.0/22"
+    cloudflare_ipv4_05 = "141.101.64.0/18"
+    cloudflare_ipv4_06 = "108.162.192.0/18"
+    cloudflare_ipv4_07 = "190.93.240.0/20"
+    cloudflare_ipv4_08 = "188.114.96.0/20"
+    cloudflare_ipv4_09 = "197.234.240.0/22"
+    cloudflare_ipv4_10 = "198.41.128.0/17"
+    cloudflare_ipv4_11 = "162.158.0.0/15"
+    cloudflare_ipv4_12 = "104.16.0.0/13"
+    cloudflare_ipv4_13 = "104.24.0.0/14"
+    cloudflare_ipv4_14 = "172.64.0.0/13"
+    cloudflare_ipv4_15 = "131.0.72.0/22"
+  }
+}
+
 resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   name                         = "ca-portfolio-frontend-prod"
   container_app_environment_id = azurerm_container_app_environment.cae_portfolio_prod.id
@@ -94,6 +118,18 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   ingress {
     external_enabled = true
     target_port      = 8080
+
+    dynamic "ip_security_restriction" {
+      for_each = local.cloudflare_ipv4_cidrs
+
+      content {
+        name             = ip_security_restriction.key
+        description      = "Allow traffic from the Cloudflare reverse proxy"
+        action           = "Allow"
+        ip_address_range = ip_security_restriction.value
+      }
+    }
+
     traffic_weight {
       percentage      = 100
       latest_revision = true
