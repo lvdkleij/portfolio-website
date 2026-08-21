@@ -241,7 +241,7 @@ resource "cloudflare_ruleset" "rate_limit" {
 
   rules = [{
     ref         = "rate_limit_by_ip"
-    description = "Block clients exceeding 10 requests per 10 seconds"
+    description = "Block clients exceeding 45 requests per 10 seconds"
     expression  = "(not cf.client.bot)"
     action      = "block"
     enabled     = true
