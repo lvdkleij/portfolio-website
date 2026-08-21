@@ -6,6 +6,8 @@ const chatRuntime = ref<ChatRuntimeContext | null>(null)
 const conversationSession = ref(0)
 const newChatAnnouncement = ref('')
 
+useBackendHeartbeat()
+
 function startNewChat() {
   chatRuntime.value = null
   conversationSession.value += 1
