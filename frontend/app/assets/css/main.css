@@ -92,8 +92,6 @@ textarea:focus-visible {
 .brand,
 .studio-header nav,
 .grounded,
-.rail-ready,
-.rail-ready span,
 .answer-label,
 .composer-controls,
 .composer-meta,
@@ -156,7 +154,48 @@ textarea:focus-visible {
   background: var(--fresh);
   font-size: 9px;
   letter-spacing: 0.12em;
+  white-space: nowrap;
   text-transform: uppercase;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+.agent-availability .dot {
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
+}
+.agent-availability[data-state='connecting'] {
+  border-color: var(--gold);
+  background: var(--yellow-soft);
+  color: var(--blue);
+}
+.agent-availability[data-state='connecting'] .dot {
+  background: var(--gold);
+  animation: availability-pulse 1.6s ease-in-out infinite;
+}
+.agent-availability[data-state='stopped'] {
+  border-color: var(--clay);
+  background: var(--clay-soft);
+  color: var(--clay);
+}
+.agent-availability[data-state='stopped'] .dot {
+  background: var(--clay);
+}
+@keyframes availability-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.42;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agent-availability[data-state='connecting'] .dot {
+    animation: none;
+  }
 }
 .studio-header nav {
   justify-content: flex-end;
@@ -674,16 +713,12 @@ textarea::-webkit-scrollbar-thumb {
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
-.rail-ready {
+.rail-sources {
+  display: block;
+  color: var(--sage);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-.rail-ready span {
-  gap: 8px;
-}
-.rail-ready span:last-child {
-  color: var(--sage);
 }
 .rail-scroll {
   min-height: 0;
@@ -850,9 +885,10 @@ textarea::-webkit-scrollbar-thumb {
     --rail: 312px;
   }
   .studio-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
+    column-gap: 18px;
   }
-  .grounded {
+  .availability-identity {
     display: none;
   }
   .context-toggle {
@@ -933,6 +969,7 @@ textarea::-webkit-scrollbar-thumb {
   .studio-header {
     min-height: var(--header);
     padding-inline: 16px;
+    column-gap: 10px;
   }
   .brand a {
     max-width: 170px;
@@ -943,6 +980,11 @@ textarea::-webkit-scrollbar-thumb {
   .brand span,
   .resume {
     display: none;
+  }
+  .grounded {
+    gap: 6px;
+    padding: 5px 8px;
+    font-size: 8px;
   }
   .transcript {
     width: calc(100% - 32px);
@@ -1289,9 +1331,6 @@ textarea::-webkit-scrollbar-thumb {
 }
 .context-rail h2 {
   color: var(--blue);
-}
-.rail-ready span:first-child {
-  color: var(--green);
 }
 .rail-scroll section:first-of-type .section-title h3 {
   color: var(--blue);

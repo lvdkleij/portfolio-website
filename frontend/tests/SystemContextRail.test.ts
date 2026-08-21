@@ -1,29 +1,31 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import SystemContextRail from '~/components/SystemContextRail.vue'
-import type { ChatRuntimeContext, ChatState } from '~/types/chat'
-
-function runtime(state: ChatState): ChatRuntimeContext {
-  return { state, trace: [], sources: [] }
-}
 
 describe('SystemContextRail', () => {
-  it.each([
-    ['stopped', undefined, 'Assistant paused'],
-    ['stopped', runtime('idle'), 'Assistant paused'],
-    ['connecting', runtime('idle'), 'Waking up AI assistant…'],
-    ['ready', runtime('idle'), 'Ready'],
-    ['stopped', runtime('connecting'), 'Waking up AI assistant…'],
-    ['ready', runtime('streaming'), 'Streaming'],
-    ['stopped', runtime('streaming'), 'Streaming'],
-    ['ready', runtime('complete'), 'Ready'],
-    ['ready', runtime('cancelled'), 'Ready'],
-    ['ready', runtime('error'), 'Ready']
-  ] as const)('shows the expected agent status', (agentState, runtimeContext, expectedLabel) => {
+  it('does not display agent availability state', () => {
     const wrapper = mount(SystemContextRail, {
-      props: { open: true, runtime: runtimeContext, agentState }
+      props: { open: true, runtime: { state: 'streaming', trace: [], sources: [] } }
     })
 
-    expect(wrapper.get('.rail-ready').text()).toContain(expectedLabel)
+    expect(wrapper.find('.rail-ready').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Streaming')
+    expect(wrapper.text()).not.toContain('Ready')
+    expect(wrapper.text()).not.toContain('Paused')
+  })
+
+  it('keeps the reported source count in the rail header', () => {
+    const wrapper = mount(SystemContextRail, {
+      props: {
+        open: true,
+        runtime: {
+          state: 'complete',
+          trace: [],
+          sources: [{ id: 'resume', title: 'Résumé' }]
+        }
+      }
+    })
+
+    expect(wrapper.get('.rail-sources').text()).toBe('1 source')
   })
 })

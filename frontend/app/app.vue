@@ -28,6 +28,7 @@ onMounted(() => { if (window.innerWidth <= 900) contextOpen.value = false })
     <span class="sr-only" aria-live="polite">{{ newChatAnnouncement }}</span>
     <AppHeader
       :context-open="contextOpen"
+      :agent-state="agentState"
       @new-chat="startNewChat"
       @toggle-context="contextOpen = !contextOpen"
     />
@@ -39,7 +40,6 @@ onMounted(() => { if (window.innerWidth <= 900) contextOpen.value = false })
       <SystemContextRail
         :open="contextOpen"
         :runtime="chatRuntime"
-        :agent-state="agentState"
         @close="contextOpen = false"
       />
       <Transition name="context-tab">
