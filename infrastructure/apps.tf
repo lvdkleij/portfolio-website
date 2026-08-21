@@ -231,3 +231,26 @@ resource "cloudflare_ruleset" "country_allowlist" {
     enabled     = true
   }]
 }
+
+resource "cloudflare_ruleset" "rate_limit" {
+  zone_id     = var.cloudflare_zone_id
+  name        = "Zone rate limiting"
+  description = "Limit excessive requests per client IP"
+  kind        = "zone"
+  phase       = "http_ratelimit"
+
+  rules = [{
+    ref         = "rate_limit_by_ip"
+    description = "Block clients exceeding 45 requests per 10 seconds"
+    expression  = "(not cf.client.bot)"
+    action      = "block"
+    enabled     = true
+
+    ratelimit = {
+      characteristics     = ["cf.colo.id", "ip.src"]
+      period              = 10
+      requests_per_period = 45
+      mitigation_timeout  = 10
+    }
+  }]
+}
