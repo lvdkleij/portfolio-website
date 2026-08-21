@@ -255,6 +255,12 @@ resource "cloudflare_ruleset" "rate_limit" {
   }]
 }
 
+resource "cloudflare_zone_setting" "min_tls_version" {
+  zone_id    = var.cloudflare_zone_id
+  setting_id = "min_tls_version"
+  value      = "1.2"
+}
+
 resource "cloudflare_zone_setting" "tls_1_3" {
   zone_id    = var.cloudflare_zone_id
   setting_id = "tls_1_3"
