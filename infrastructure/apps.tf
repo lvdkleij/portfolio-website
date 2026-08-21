@@ -201,11 +201,6 @@ resource "azurerm_container_app_custom_domain" "frontend_chat" {
   ]
 }
 
-variable "cloudflare_zone_id" {
-  type      = string
-  sensitive = true
-}
-
 resource "cloudflare_bot_management" "strict" {
   zone_id = var.cloudflare_zone_id
 
