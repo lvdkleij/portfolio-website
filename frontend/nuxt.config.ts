@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
     public: {
-      chatApiUrl: '/api/hello',
+      chatApiUrl: '/api/chat/stream',
       resumeUrl: ''
     }
   },

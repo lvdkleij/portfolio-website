@@ -45,6 +45,34 @@ describe('useChatStream', () => {
     expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toEqual(request)
   })
 
+  it('updates the response before the stream finishes', async () => {
+    const encoder = new TextEncoder()
+    let streamController: ReadableStreamDefaultController<Uint8Array> | undefined
+    const response = new Response(new ReadableStream<Uint8Array>({
+      start(controller) {
+        streamController = controller
+      }
+    }), { headers: { 'content-type': 'text/event-stream' } })
+    const chat = useChatStream({
+      endpoint: 'https://example.test/api/chat/stream',
+      fetcher: async () => response
+    })
+
+    const pending = chat.start(request)
+    streamController?.enqueue(encoder.encode('event: delta\ndata: {"type":"delta","text":"First"}\n\n'))
+
+    await vi.waitFor(() => expect(chat.responseText.value).toBe('First'))
+    expect(chat.state.value).toBe('streaming')
+
+    streamController?.enqueue(encoder.encode('event: delta\ndata: {"type":"delta","text":" second"}\n\n'))
+    streamController?.enqueue(encoder.encode('event: done\ndata: {"type":"done"}\n\n'))
+    streamController?.close()
+    await pending
+
+    expect(chat.responseText.value).toBe('First second')
+    expect(chat.state.value).toBe('complete')
+  })
+
   it('maps rate limiting and retry-after metadata', async () => {
     const chat = useChatStream({
       endpoint: 'https://example.test/api/chat',
