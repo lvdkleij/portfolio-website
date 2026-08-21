@@ -6,7 +6,7 @@ const chatRuntime = ref<ChatRuntimeContext | null>(null)
 const conversationSession = ref(0)
 const newChatAnnouncement = ref('')
 
-useBackendHeartbeat()
+const { state: agentState } = useBackendHeartbeat()
 
 function startNewChat() {
   chatRuntime.value = null
@@ -36,7 +36,12 @@ onMounted(() => { if (window.innerWidth <= 900) contextOpen.value = false })
         :key="conversationSession"
         @runtime-change="chatRuntime = $event"
       />
-      <SystemContextRail :open="contextOpen" :runtime="chatRuntime" @close="contextOpen = false" />
+      <SystemContextRail
+        :open="contextOpen"
+        :runtime="chatRuntime"
+        :agent-state="agentState"
+        @close="contextOpen = false"
+      />
       <Transition name="context-tab">
         <button v-if="!contextOpen" class="context-tab" type="button" @click="contextOpen = true">
           <i class="dot" /> Context

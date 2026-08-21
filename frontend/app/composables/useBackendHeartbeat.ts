@@ -1,4 +1,6 @@
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, readonly, ref } from 'vue'
+
+export type BackendHeartbeatState = 'connecting' | 'ready' | 'stopped'
 
 type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
@@ -15,6 +17,7 @@ const DEFAULT_INACTIVITY_TIMEOUT_MS = 10 * 60_000
 const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const
 
 export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
+  const state = ref<BackendHeartbeatState>('stopped')
   const endpoint = options.endpoint ?? '/api/heartbeat'
   const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis)
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? DEFAULT_HEARTBEAT_INTERVAL_MS
@@ -44,6 +47,8 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
     if (!started || !isVisible() || !isRecentlyActive()) return
     if (heartbeatInFlight) return heartbeatInFlight
 
+    if (state.value !== 'ready') state.value = 'connecting'
+
     const controller = new AbortController()
     requestController = controller
 
@@ -54,9 +59,11 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
     })
       .then((response) => {
         if (!response.ok) throw new Error(`Heartbeat failed (${response.status})`)
+        if (started && isVisible() && isRecentlyActive()) state.value = 'ready'
       })
       .catch(() => {
         // Warming is best-effort. Chat requests retain their own visible error handling.
+        if (started) state.value = 'stopped'
       })
       .finally(() => {
         if (heartbeatInFlight === request) heartbeatInFlight = undefined
@@ -70,6 +77,7 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
   function heartbeatTick() {
     if (!isVisible() || !isRecentlyActive()) {
       clearHeartbeatInterval()
+      state.value = 'stopped'
       return
     }
 
@@ -94,6 +102,7 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
   function handleVisibilityChange() {
     if (!isVisible()) {
       clearHeartbeatInterval()
+      state.value = 'stopped'
       return
     }
 
@@ -124,6 +133,7 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
     if (!started) return
 
     started = false
+    state.value = 'stopped'
     clearHeartbeatInterval()
     requestController?.abort()
     requestController = undefined
@@ -135,5 +145,5 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
   onMounted(start)
   onBeforeUnmount(stop)
 
-  return { start, stop }
+  return { state: readonly(state), start, stop }
 }
