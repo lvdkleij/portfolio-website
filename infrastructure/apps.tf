@@ -215,3 +215,19 @@ resource "cloudflare_bot_management" "strict" {
   cf_robots_variant     = "policy_only"
   is_robots_txt_managed = true
 }
+
+resource "cloudflare_ruleset" "country_allowlist" {
+  zone_id    = var.cloudflare_zone_id
+  name       = "Country allowlist"
+  kind       = "zone"
+  phase      = "http_request_firewall_custom"
+  description = "Only permit traffic from approved Western European countries"
+
+  rules = [{
+    ref         = "block_countries_outside_allowlist"
+    description = "Block traffic outside BE, ES, IT, PT, GB, NL, LU, FR and DE"
+    expression  = "(not ip.src.country in {\"BE\" \"ES\" \"IT\" \"PT\" \"GB\" \"NL\" \"LU\" \"FR\" \"DE\"})"
+    action      = "block"
+    enabled     = true
+  }]
+}
