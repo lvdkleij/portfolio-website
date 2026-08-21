@@ -200,3 +200,18 @@ resource "azurerm_container_app_custom_domain" "frontend_chat" {
     cloudflare_dns_record.frontend_chat_verification
   ]
 }
+
+resource "cloudflare_bot_management" "strict" {
+  zone_id = var.cloudflare_zone_id
+
+  fight_mode = true
+
+  ai_bots_protection      = "block"
+  content_bots_protection = "block"
+  crawler_protection      = "enabled"
+
+  enable_js = true
+
+  cf_robots_variant     = "policy_only"
+  is_robots_txt_managed = true
+}
