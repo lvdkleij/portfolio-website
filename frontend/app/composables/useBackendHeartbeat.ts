@@ -62,8 +62,8 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
         if (started && isVisible() && isRecentlyActive()) state.value = 'ready'
       })
       .catch(() => {
-        // Warming is best-effort. Chat requests retain their own visible error handling.
-        if (started) state.value = 'stopped'
+        // Warming is best-effort. Preserve the last active state and retry on the
+        // next interval; "stopped" is reserved for intentional inactivity.
       })
       .finally(() => {
         if (heartbeatInFlight === request) heartbeatInFlight = undefined
