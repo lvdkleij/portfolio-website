@@ -137,7 +137,7 @@ resource "azurerm_container_app" "ca_portfolio_frontend_prod" {
   }
 
   template {
-    min_replicas               = 0
+    min_replicas               = 1
     max_replicas               = 1
     cooldown_period_in_seconds = 600
 
