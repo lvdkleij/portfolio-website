@@ -19,14 +19,11 @@ describe('StudioComposer', () => {
     expect(textarea.attributes('aria-describedby')).toBe('prompt-character-count')
   })
 
-  it('shows the current count before the microphone and highlights the final 50 characters', async () => {
+  it('shows the current count and highlights the final 50 characters', async () => {
     wrapper = mount(StudioComposer)
     const counter = wrapper.get('#prompt-character-count')
-    const actions = wrapper.get('.composer-actions')
 
     expect(counter.text()).toBe(`0 / ${MAX_CHAT_PROMPT_LENGTH}`)
-    expect(actions.element.children[0]).toBe(counter.element)
-    expect(actions.element.children[1]).toBe(wrapper.get('.voice-trigger').element)
 
     await wrapper.get('textarea').setValue('x'.repeat(MAX_CHAT_PROMPT_LENGTH - 51))
     expect(counter.classes()).not.toContain('is-near-limit')
@@ -39,7 +36,7 @@ describe('StudioComposer', () => {
   it('emits normal messages unchanged', async () => {
     wrapper = mount(StudioComposer)
     await wrapper.get('textarea').setValue('Tell me about your work')
-    await wrapper.get('button.send').trigger('click')
+    await wrapper.get('form').trigger('submit')
 
     expect(wrapper.emitted('send')).toEqual([[
       { prompt: 'Tell me about your work', attachment: undefined }
@@ -53,7 +50,7 @@ describe('StudioComposer', () => {
     await wrapper.get('textarea').setValue(oversizedPrompt)
     expect(wrapper.get<HTMLTextAreaElement>('textarea').element.value).toHaveLength(MAX_CHAT_PROMPT_LENGTH)
 
-    await wrapper.get('button.send').trigger('click')
+    await wrapper.get('form').trigger('submit')
     const submission = wrapper.emitted('send')?.[0]?.[0] as { prompt: string }
     expect(submission.prompt).toHaveLength(MAX_CHAT_PROMPT_LENGTH)
   })

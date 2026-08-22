@@ -1,52 +1,35 @@
 <script setup lang="ts">
-import type { ChatRuntimeContext } from '~/types/chat'
-
-const contextOpen = ref(true)
-const chatRuntime = ref<ChatRuntimeContext | null>(null)
 const conversationSession = ref(0)
 const newChatAnnouncement = ref('')
 
 const { state: agentState } = useBackendHeartbeat()
 
 function startNewChat() {
-  chatRuntime.value = null
   conversationSession.value += 1
   newChatAnnouncement.value = ''
 
   nextTick(() => {
     newChatAnnouncement.value = 'New ephemeral chat started'
-    document.querySelector<HTMLTextAreaElement>('#prompt')?.focus()
+    document.querySelector<HTMLTextAreaElement>('#asterra-question')?.focus()
   })
 }
-
-onMounted(() => { if (window.innerWidth <= 900) contextOpen.value = false })
 </script>
 
 <template>
-  <div class="studio-shell">
+  <div class="asterra-app">
     <NuxtRouteAnnouncer />
     <span class="sr-only" aria-live="polite">{{ newChatAnnouncement }}</span>
-    <AppHeader
-      :context-open="contextOpen"
-      :agent-state="agentState"
-      @new-chat="startNewChat"
-      @toggle-context="contextOpen = !contextOpen"
-    />
-    <div class="studio-body">
-      <ConversationWorkspace
-        :key="conversationSession"
-        @runtime-change="chatRuntime = $event"
-      />
-      <SystemContextRail
-        :open="contextOpen"
-        :runtime="chatRuntime"
-        @close="contextOpen = false"
-      />
-      <Transition name="context-tab">
-        <button v-if="!contextOpen" class="context-tab" type="button" @click="contextOpen = true">
-          <i class="dot" /> Context
-        </button>
-      </Transition>
+    <div class="case-study-strip">A case study by Lucas van der Kleij</div>
+    <div class="asterra-layout">
+      <CaseStudyPanel />
+      <section class="assistant-pane" aria-label="Asterra Bank assistant">
+        <main class="assistant-stage" aria-label="Asterra banking assistant workspace">
+          <div class="assistant-workspace">
+            <AppHeader :agent-state="agentState" @new-chat="startNewChat" />
+            <ConversationWorkspace :key="conversationSession" />
+          </div>
+        </main>
+      </section>
     </div>
   </div>
 </template>

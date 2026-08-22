@@ -1,3 +1,45 @@
+# Theme and Design Tokens
+
+## Compact token summary
+
+- Palette: paper #F5F7FF, surface #FFFFFF, subtle #EEF1FF, ink #111629, muted #35405C/#65708B, cobalt #2F43D8/#5267FF/#E7EBFF, violet #7447E8/#F0E9FF, aqua #087F91/#27C4D4/#DCF7FA, line #D8DEEE/#AAB4D2, warning #8B5C12/#F8EED8, error #8B342F/#F7E7E5.
+- Typography: Space Grotesk for display, Inter for body/financial values, JetBrains Mono for metadata.
+- Layout: 28px authorship strip; 35% case-study pane and 65% assistant pane at 1024px+; assistant content capped at 980px and transcript/composer at 760px.
+- Shape: 24px main workspace/composer radius; pill compact controls; 12–18px sheets; 1px hairlines.
+- Elevation: restrained 0 8px 28px rgba(17,22,41,.08) on the white assistant workspace.
+- Breakpoints: 1180px compact desktop, 1024px stacked layout, 640px mobile.
+- Motion: 160–200ms transitions and subtle activity pulses, disabled for prefers-reduced-motion.
+
+## Raw Nuxt configuration
+
+```ts
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  ssr: false,
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: true },
+  css: ['~/assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      chatApiUrl: '/api/chat/stream',
+      resumeUrl: ''
+    }
+  },
+  app: {
+    head: {
+      title: 'Asterra Bank AI Assistant — A Case Study by Lucas van der Kleij',
+      meta: [
+        { name: 'description', content: 'A fictional European AI banking assistant case study by Lucas van der Kleij.' },
+        { name: 'theme-color', content: '#F5F7FF' }
+      ]
+    }
+  }
+})
+```
+
+## Raw global stylesheet
+
+```css
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@600;700&display=swap');
 
 :root {
@@ -847,7 +889,6 @@ textarea::-webkit-scrollbar-thumb {
   font-size: 14px;
   font-weight: 600;
 }
-
 .add-menu-list small {
   color: var(--ink-soft);
   font: 500 8px 'JetBrains Mono', monospace;
@@ -1539,3 +1580,4 @@ textarea::-webkit-scrollbar-thumb {
     transition-duration: 0.01ms !important;
   }
 }
+```
