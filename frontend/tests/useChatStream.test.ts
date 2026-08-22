@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { watch } from 'vue'
 import type { ChatRequest } from '~/types/chat'
 import { useChatStream } from '~/composables/useChatStream'
 import { renderSafeMarkdown } from '~/utils/markdown'
@@ -19,6 +20,36 @@ function sseResponse(parts: string[], status = 200, headers: Record<string, stri
     status,
     headers: { 'content-type': 'text/event-stream', ...headers }
   })
+}
+
+function manualDisplayScheduler() {
+  let timestamp = 0
+  let nextHandle = 0
+  let immediate = false
+  const callbacks = new Map<number, (timestamp: number) => void>()
+
+  return {
+    scheduler: {
+      schedule(callback: (timestamp: number) => void) {
+        const handle = ++nextHandle
+        callbacks.set(handle, callback)
+        return () => callbacks.delete(handle)
+      },
+      now: () => timestamp,
+      flushImmediately: () => immediate
+    },
+    advance(milliseconds: number) {
+      timestamp += milliseconds
+      const ready = [...callbacks.values()]
+      callbacks.clear()
+      ready.forEach(callback => callback(timestamp))
+    },
+    pendingCount: () => callbacks.size,
+    setImmediate(value: boolean) {
+      immediate = value
+    },
+    now: () => timestamp
+  }
 }
 
 describe('useChatStream', () => {
@@ -44,6 +75,98 @@ describe('useChatStream', () => {
     expect(chat.sources.value[0]?.title).toBe('Résumé')
     expect(chat.usage.value).toEqual({ inputTokens: 4, outputTokens: 2 })
     expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toEqual(request)
+  })
+
+  it('reveals the first delta immediately and adaptively paces later bursty deltas', async () => {
+    const encoder = new TextEncoder()
+    const display = manualDisplayScheduler()
+    let streamController: ReadableStreamDefaultController<Uint8Array> | undefined
+    const response = new Response(new ReadableStream<Uint8Array>({
+      start(controller) {
+        streamController = controller
+      }
+    }), { headers: { 'content-type': 'text/event-stream' } })
+    const chat = useChatStream({
+      endpoint: 'https://example.test/api/chat/stream',
+      fetcher: async () => response,
+      displayIntervalMs: 32,
+      completionDrainMs: 120,
+      displayScheduler: display.scheduler
+    })
+    const commits: Array<{ text: string, timestamp: number }> = []
+    const stopWatching = watch(chat.responseText, text => {
+      commits.push({ text, timestamp: display.now() })
+    }, { flush: 'sync' })
+
+    const pending = chat.start(request)
+    streamController?.enqueue(encoder.encode([
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: 'A' })}`,
+      '',
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: 'B' })}`,
+      '',
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: '👨‍👩‍👧‍👦' })}`,
+      '',
+      'event: delta',
+      `data: ${JSON.stringify({ type: 'delta', text: 'D' })}`,
+      '',
+      ''
+    ].join('\n')))
+
+    await vi.waitFor(() => expect(display.pendingCount()).toBe(1))
+    expect(chat.responseText.value).toBe('A')
+
+    display.advance(16)
+    expect(chat.responseText.value).toBe('A')
+    expect(display.pendingCount()).toBe(1)
+
+    display.advance(16)
+    expect(chat.responseText.value).toBe('AB')
+
+    display.advance(32)
+    expect(chat.responseText.value).toBe('AB👨‍👩‍👧‍👦')
+
+    streamController?.enqueue(encoder.encode('event: done\ndata: {"type":"done"}\n\n'))
+    streamController?.close()
+    await vi.waitFor(() => expect(display.pendingCount()).toBe(1))
+
+    display.advance(32)
+    await pending
+    stopWatching()
+
+    expect(chat.responseText.value).toBe('AB👨‍👩‍👧‍👦D')
+    expect(chat.state.value).toBe('complete')
+    expect(commits.map(commit => commit.text)).toEqual([
+      'A',
+      'AB',
+      'AB👨‍👩‍👧‍👦',
+      'AB👨‍👩‍👧‍👦D'
+    ])
+    expect(commits.slice(1).every((commit, index) => (
+      commit.timestamp - (commits[index]?.timestamp ?? 0) >= 32
+    ))).toBe(true)
+  })
+
+  it('flushes queued display text without animation when motion is reduced', async () => {
+    const display = manualDisplayScheduler()
+    display.setImmediate(true)
+    const chat = useChatStream({
+      endpoint: 'https://example.test/api/chat',
+      fetcher: async () => sseResponse([
+        'event: delta\ndata: {"type":"delta","text":"Hello "}\n\n',
+        'event: delta\ndata: {"type":"delta","text":"world"}\n\n',
+        'event: done\ndata: {"type":"done"}\n\n'
+      ]),
+      displayScheduler: display.scheduler
+    })
+
+    await chat.start(request)
+
+    expect(chat.responseText.value).toBe('Hello world')
+    expect(chat.state.value).toBe('complete')
+    expect(display.pendingCount()).toBe(0)
   })
 
   it('accumulates and renders Markdown split across stream deltas', async () => {
@@ -103,9 +226,14 @@ describe('useChatStream', () => {
   })
 
   it('preserves partial output when a stream disconnects before done', async () => {
+    const display = manualDisplayScheduler()
     const chat = useChatStream({
       endpoint: 'https://example.test/api/chat',
-      fetcher: async () => sseResponse(['event: delta\ndata: {"type":"delta","text":"Partial"}\n\n'])
+      fetcher: async () => sseResponse([
+        'event: delta\ndata: {"type":"delta","text":"Par"}\n\n',
+        'event: delta\ndata: {"type":"delta","text":"tial"}\n\n'
+      ]),
+      displayScheduler: display.scheduler
     })
 
     await chat.start(request)
@@ -113,6 +241,31 @@ describe('useChatStream', () => {
     expect(chat.responseText.value).toBe('Partial')
     expect(chat.state.value).toBe('error')
     expect(chat.error.value?.code).toBe('stream_interrupted')
+    expect(display.pendingCount()).toBe(0)
+  })
+
+  it('flushes received text and cancels when stopped during the final visual drain', async () => {
+    const display = manualDisplayScheduler()
+    const chat = useChatStream({
+      endpoint: 'https://example.test/api/chat',
+      fetcher: async () => sseResponse([
+        'event: delta\ndata: {"type":"delta","text":"Already "}\n\n',
+        'event: delta\ndata: {"type":"delta","text":"received"}\n\n',
+        'event: done\ndata: {"type":"done"}\n\n'
+      ]),
+      displayScheduler: display.scheduler
+    })
+
+    const pending = chat.start(request)
+    await vi.waitFor(() => expect(display.pendingCount()).toBe(1))
+    expect(chat.responseText.value).toBe('Already ')
+
+    chat.stop()
+    await pending
+
+    expect(chat.responseText.value).toBe('Already received')
+    expect(chat.state.value).toBe('cancelled')
+    expect(display.pendingCount()).toBe(0)
   })
 
   it('moves through the cold-start state and can be cancelled', async () => {
@@ -134,7 +287,15 @@ describe('useChatStream', () => {
   })
 
   it('aborts a replaced request without overwriting the replacement state', async () => {
+    const encoder = new TextEncoder()
+    const display = manualDisplayScheduler()
     let call = 0
+    let firstController: ReadableStreamDefaultController<Uint8Array> | undefined
+    const firstResponse = new Response(new ReadableStream<Uint8Array>({
+      start(controller) {
+        firstController = controller
+      }
+    }), { headers: { 'content-type': 'text/event-stream' } })
     const fetcher = (_input: RequestInfo | URL, init?: RequestInit) => {
       call += 1
       if (call === 2) {
@@ -143,13 +304,30 @@ describe('useChatStream', () => {
           'event: done\ndata: {"type":"done"}\n\n'
         ]))
       }
-      return new Promise<Response>((_resolve, reject) => {
-        init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')))
+      init?.signal?.addEventListener('abort', () => {
+        firstController?.error(new DOMException('Aborted', 'AbortError'))
       })
+      return Promise.resolve(firstResponse)
     }
-    const chat = useChatStream({ endpoint: 'https://example.test/api/chat', fetcher })
+    const chat = useChatStream({
+      endpoint: 'https://example.test/api/chat',
+      fetcher,
+      displayScheduler: display.scheduler
+    })
 
     const first = chat.start(request)
+    firstController?.enqueue(encoder.encode([
+      'event: delta',
+      'data: {"type":"delta","text":"Old "}',
+      '',
+      'event: delta',
+      'data: {"type":"delta","text":"queued"}',
+      '',
+      ''
+    ].join('\n')))
+    await vi.waitFor(() => expect(display.pendingCount()).toBe(1))
+    expect(chat.responseText.value).toBe('Old ')
+
     const second = chat.start({ ...request, clientRequestId: 'request-2' })
     await Promise.all([first, second])
 

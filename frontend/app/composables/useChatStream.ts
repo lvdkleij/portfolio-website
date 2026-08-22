@@ -16,6 +16,64 @@ type UseChatStreamOptions = {
   endpoint?: string
   fetcher?: Fetcher
   coldStartDelayMs?: number
+  displayIntervalMs?: number
+  completionDrainMs?: number
+  displayScheduler?: StreamDisplayScheduler
+}
+
+type StreamDisplayScheduler = {
+  schedule: (callback: (timestamp: number) => void) => () => void
+  now: () => number
+  flushImmediately: () => boolean
+}
+
+type GraphemeSegmenter = {
+  segment: (input: string) => Iterable<{ segment: string }>
+}
+
+type GraphemeSegmenterConstructor = new (
+  locales?: string | string[],
+  options?: { granularity: 'grapheme' },
+) => GraphemeSegmenter
+
+const Segmenter = (Intl as unknown as { Segmenter?: GraphemeSegmenterConstructor }).Segmenter
+const graphemeSegmenter = Segmenter ? new Segmenter(undefined, { granularity: 'grapheme' }) : undefined
+
+function splitGraphemes(value: string) {
+  return graphemeSegmenter
+    ? Array.from(graphemeSegmenter.segment(value), part => part.segment)
+    : Array.from(value)
+}
+
+function schedulerNow() {
+  return typeof performance === 'undefined' ? Date.now() : performance.now()
+}
+
+function createDisplayScheduler(): StreamDisplayScheduler {
+  const reducedMotion = typeof matchMedia === 'function'
+    ? matchMedia('(prefers-reduced-motion: reduce)')
+    : undefined
+
+  return {
+    schedule(callback) {
+      if (typeof document !== 'undefined' && document.hidden) {
+        const handle = setTimeout(() => callback(schedulerNow()), 0)
+        return () => clearTimeout(handle)
+      }
+
+      if (typeof requestAnimationFrame === 'function') {
+        const handle = requestAnimationFrame(callback)
+        return () => cancelAnimationFrame(handle)
+      }
+
+      const handle = setTimeout(() => callback(schedulerNow()), 16)
+      return () => clearTimeout(handle)
+    },
+    now: schedulerNow,
+    flushImmediately() {
+      return (typeof document !== 'undefined' && document.hidden) || Boolean(reducedMotion?.matches)
+    }
+  }
 }
 
 class StreamFailure extends Error {
@@ -87,8 +145,116 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
   const durationMs = ref<number>()
   const coldStart = ref(false)
   const active = computed(() => state.value === 'connecting' || state.value === 'streaming')
+  const displayScheduler = options.displayScheduler ?? createDisplayScheduler()
+  const displayIntervalMs = Math.max(0, options.displayIntervalMs ?? 32)
+  const completionDrainMs = Math.max(0, options.completionDrainMs ?? 120)
   let controller: AbortController | undefined
   let coldStartTimer: ReturnType<typeof setTimeout> | undefined
+  let pendingText = ''
+  let cancelDisplayFrame: (() => void) | undefined
+  let lastDisplayCommitAt = Number.NEGATIVE_INFINITY
+  let completionDeadline: number | undefined
+  let resolveDisplayDrain: (() => void) | undefined
+  let displayGeneration = 0
+
+  function settleDisplayDrain() {
+    completionDeadline = undefined
+    const resolve = resolveDisplayDrain
+    resolveDisplayDrain = undefined
+    resolve?.()
+  }
+
+  function cancelScheduledDisplay() {
+    cancelDisplayFrame?.()
+    cancelDisplayFrame = undefined
+  }
+
+  function flushPendingDisplay() {
+    displayGeneration += 1
+    cancelScheduledDisplay()
+    if (pendingText) {
+      responseText.value += pendingText
+      pendingText = ''
+      lastDisplayCommitAt = displayScheduler.now()
+    }
+    settleDisplayDrain()
+  }
+
+  function discardPendingDisplay() {
+    displayGeneration += 1
+    cancelScheduledDisplay()
+    pendingText = ''
+    lastDisplayCommitAt = Number.NEGATIVE_INFINITY
+    settleDisplayDrain()
+  }
+
+  function revealCount(total: number, timestamp: number) {
+    if (completionDeadline !== undefined) {
+      const remainingMs = Math.max(0, completionDeadline - timestamp)
+      const remainingCommits = Math.max(1, Math.ceil(remainingMs / Math.max(1, displayIntervalMs)))
+      return Math.max(1, Math.ceil(total / remainingCommits))
+    }
+
+    const targetFrames = total > 96 ? 2 : total > 32 ? 3 : 4
+    return Math.max(1, Math.ceil(total / targetFrames))
+  }
+
+  function scheduleDisplay() {
+    if (!pendingText || cancelDisplayFrame) return
+
+    if (displayScheduler.flushImmediately()) {
+      flushPendingDisplay()
+      return
+    }
+
+    const generation = displayGeneration
+    cancelDisplayFrame = displayScheduler.schedule((timestamp) => {
+      cancelDisplayFrame = undefined
+      if (generation !== displayGeneration || !pendingText) return
+
+      if (timestamp - lastDisplayCommitAt < displayIntervalMs) {
+        scheduleDisplay()
+        return
+      }
+
+      const graphemes = splitGraphemes(pendingText)
+      const count = Math.min(graphemes.length, revealCount(graphemes.length, timestamp))
+      responseText.value += graphemes.slice(0, count).join('')
+      pendingText = graphemes.slice(count).join('')
+      lastDisplayCommitAt = timestamp
+
+      if (pendingText) scheduleDisplay()
+      else settleDisplayDrain()
+    })
+  }
+
+  function enqueueDisplayText(text: string) {
+    if (!text) return
+
+    if (!responseText.value && !pendingText) {
+      responseText.value = text
+      lastDisplayCommitAt = displayScheduler.now()
+      return
+    }
+
+    pendingText += text
+    scheduleDisplay()
+  }
+
+  function drainDisplay() {
+    if (!pendingText) return Promise.resolve()
+    if (displayScheduler.flushImmediately() || completionDrainMs === 0) {
+      flushPendingDisplay()
+      return Promise.resolve()
+    }
+
+    completionDeadline = displayScheduler.now() + completionDrainMs
+    const drained = new Promise<void>((resolve) => {
+      resolveDisplayDrain = resolve
+    })
+    scheduleDisplay()
+    return drained
+  }
 
   function clearColdStartTimer() {
     if (coldStartTimer) clearTimeout(coldStartTimer)
@@ -99,6 +265,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
     controller?.abort()
     controller = undefined
     clearColdStartTimer()
+    discardPendingDisplay()
     responseText.value = ''
     trace.value = []
     sources.value = []
@@ -113,7 +280,15 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
 
   function stop() {
     if (!active.value || !controller) return
+    flushPendingDisplay()
     controller.abort()
+  }
+
+  function dispose() {
+    controller?.abort()
+    controller = undefined
+    clearColdStartTimer()
+    discardPendingDisplay()
   }
 
   async function start(request: ChatRequest) {
@@ -184,7 +359,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
           clearColdStartTimer()
           coldStart.value = false
           state.value = 'streaming'
-          responseText.value += event.text
+          enqueueDisplayText(event.text)
           return
         }
 
@@ -201,7 +376,6 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
         model.value = event.model ?? model.value
         durationMs.value = event.durationMs
         usage.value = event.usage
-        state.value = 'complete'
       })
 
       if (!receivedDone) {
@@ -211,10 +385,19 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
           retryable: true
         })
       }
+
+      await drainDisplay()
+      if (controller !== requestController) return
+      if (requestController.signal.aborted) {
+        state.value = 'cancelled'
+        return
+      }
+      state.value = 'complete'
     } catch (caught) {
       if (controller !== requestController) return
       clearColdStartTimer()
       coldStart.value = false
+      flushPendingDisplay()
       if (
         requestController.signal.aborted
         || (typeof DOMException !== 'undefined' && caught instanceof DOMException && caught.name === 'AbortError')
@@ -243,6 +426,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
     coldStart: readonly(coldStart),
     start,
     stop,
-    reset
+    reset,
+    dispose
   }
 }
