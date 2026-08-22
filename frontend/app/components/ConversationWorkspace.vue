@@ -15,7 +15,7 @@ import type {
 import { limitChatHistory } from '~/utils/chatHistory';
 import { MAX_CHAT_PROMPT_LENGTH } from '~/utils/chatLimits';
 import { renderSafeMarkdown } from '~/utils/markdown';
-import { resolveMessageAnchor } from '~/utils/chatScroll';
+import { createFrameCoalescer, resolveMessageAnchor } from '~/utils/chatScroll';
 
 const emit = defineEmits<{ runtimeChange: [runtime: ChatRuntimeContext] }>();
 
@@ -23,6 +23,7 @@ type GuestTurn = {
   id: string;
   user: ChatMessage;
   response: string;
+  responseHtml: string;
   state: ChatState;
   trace: ChatTraceStage[];
   sources: ChatSource[];
@@ -38,6 +39,7 @@ const scrollArea = ref<HTMLElement>();
 const guestTurns = ref<GuestTurn[]>([]);
 const activeTurnId = ref<string | null>(null);
 const followStream = ref(false);
+const streamFollowScroll = createFrameCoalescer();
 
 const {
   state: streamState,
@@ -52,6 +54,7 @@ const {
   durationMs,
   start,
   stop,
+  dispose,
 } = useChatStream();
 
 function createId(prefix: string) {
@@ -92,11 +95,18 @@ function activeTurn() {
   return guestTurns.value.find((turn) => turn.id === activeTurnId.value);
 }
 
-function syncActiveTurn() {
+function syncActiveResponse() {
   const turn = activeTurn();
   if (!turn) return;
 
   turn.response = responseText.value;
+  turn.responseHtml = renderSafeMarkdown(responseText.value);
+}
+
+function syncActiveRuntime() {
+  const turn = activeTurn();
+  if (!turn) return;
+
   turn.state = streamState.value;
   turn.trace = [...trace.value];
   turn.sources = [...sources.value];
@@ -117,7 +127,9 @@ function syncActiveTurn() {
   });
 }
 
-watch([streamState, responseText, trace, sources, usage, error, requestId, model, durationMs], syncActiveTurn, {
+watch(responseText, syncActiveResponse, { flush: 'sync' });
+
+watch([streamState, trace, sources, usage, error, requestId, model, durationMs], syncActiveRuntime, {
   deep: true,
   flush: 'sync',
 });
@@ -126,7 +138,10 @@ watch(
   () => guestTurns.value[guestTurns.value.length - 1]?.response.length ?? 0,
   (length, previousLength) => {
     if (length === previousLength || !followStream.value || !activeTurnId.value) return;
-    scrollToMessage(activeTurnId.value, 'response', 'smooth');
+    streamFollowScroll.schedule(() => {
+      if (!followStream.value || !activeTurnId.value) return;
+      void scrollToMessage(activeTurnId.value, 'response', 'auto');
+    });
   },
   { flush: 'post' },
 );
@@ -166,13 +181,16 @@ async function scrollToMessage(messageId: string, target: 'prompt' | 'response',
 }
 
 function pauseStreamFollow() {
-  if (active.value) followStream.value = false;
+  if (!active.value) return;
+  followStream.value = false;
+  streamFollowScroll.cancel();
 }
 
 async function runTurn(turn: GuestTurn) {
   activeTurnId.value = turn.id;
   followStream.value = true;
   turn.response = '';
+  turn.responseHtml = '';
   turn.state = 'connecting';
   turn.trace = [];
   turn.sources = [];
@@ -190,8 +208,9 @@ async function runTurn(turn: GuestTurn) {
   await start(request);
 
   if (followStream.value) {
+    streamFollowScroll.cancel();
     await nextTick();
-    scrollToMessage(turn.id, 'response', 'smooth');
+    await scrollToMessage(turn.id, 'response', 'smooth');
   }
 }
 
@@ -211,6 +230,7 @@ function sendMessage(submission: ChatSubmission) {
       attachment,
     },
     response: '',
+    responseHtml: '',
     state: 'connecting',
     trace: [],
     sources: [],
@@ -218,7 +238,7 @@ function sendMessage(submission: ChatSubmission) {
   });
 
   guestTurns.value.push(turn);
-  nextTick(() => scrollToMessage(turn.id, 'prompt', 'smooth'));
+  nextTick(() => void scrollToMessage(turn.id, 'prompt', 'smooth'));
   void runTurn(turn);
 }
 
@@ -236,7 +256,10 @@ onMounted(() => {
   emit('runtimeChange', { state: 'idle', trace: [], sources: [] });
 });
 
-onBeforeUnmount(stop);
+onBeforeUnmount(() => {
+  streamFollowScroll.cancel();
+  dispose();
+});
 </script>
 
 <template>
@@ -289,7 +312,7 @@ onBeforeUnmount(stop);
                 class="guest-answer markdown-answer"
                 :class="{ 'is-streaming': turn.state === 'streaming' }"
                 :aria-busy="turn.state === 'streaming'"
-                v-html="renderSafeMarkdown(turn.response)"
+                v-html="turn.responseHtml"
               />
 
               <div v-if="turn.state === 'error' && turn.error" class="chat-response-state error" role="alert">
