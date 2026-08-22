@@ -3,50 +3,46 @@
   "targets": {
     "/": {
       "targetKind": "existing-ui",
-      "projectId": "0817ca8a-a30e-40e8-b16a-35514a27ab52",
-      "baselineDraftId": "48e54cc2-eaf7-4695-b0ed-af1bb21777d1",
-      "activeDraftId": "fd536dc8-9ad8-4a7b-a622-3910dffe9f18",
+      "projectId": "f48fbb8b-d667-47db-ab80-030770ac89bb",
+      "activeDraftId": "bed58d15-f24d-49a8-a287-1ffc2ef60397",
       "designSystemPath": ".superdesign/design-system.md",
+      "referenceIds": [],
       "contextFiles": [
         ".superdesign/design-system.md",
         "frontend/app/app.vue",
+        "frontend/app/components/CaseStudyPanel.vue",
         "frontend/app/components/AppHeader.vue",
-        "frontend/app/components/SystemContextRail.vue",
-        "frontend/app/composables/useBackendHeartbeat.ts",
-        "frontend/app/assets/css/main.css:1:195",
-        "frontend/app/assets/css/main.css:617:700",
-        "frontend/app/assets/css/main.css:852:950",
-        "frontend/app/assets/css/main.css:1200:1305"
+        "frontend/app/components/ConversationWorkspace.vue",
+        "frontend/app/components/ConversationTurn.vue",
+        "frontend/app/components/StudioComposer.vue",
+        "frontend/app/components/JobAttachmentSheet.vue",
+        "frontend/app/components/PromptTrace.vue",
+        "frontend/app/assets/css/main.css:1:380",
+        "frontend/app/assets/css/main.css:406:710",
+        "frontend/app/assets/css/main.css:997:1210",
+        "frontend/app/assets/css/main.css:1335:1541"
       ],
       "fingerprints": {
-        ".superdesign/design-system.md": "567deab23b3d48d080d58ba41ffbeeac625ba8e8555ee06142b0e7b51b09ae00",
-        "frontend/app/app.vue": "a06202895c53dff671b075d7b6f3b953dcd49d5093f0e1ea64a8007d1fc116a7",
-        "frontend/app/components/AppHeader.vue": "d206bfc40d10abed033ae0e76e0a607f925cb36970631ee5e248103b1e2c87f6",
-        "frontend/app/components/SystemContextRail.vue": "31283241a40ca327b56039bf15b8f8ab9a3258db05f818ed8aa502a35c8bcbec",
-        "frontend/app/composables/useBackendHeartbeat.ts": "bcbcca3fd33bc868b8065b01e8fd8b30307843d036a52fb19e2a81f246165bc4",
-        "frontend/app/assets/css/main.css": "9b0983111558b76b96f6e6913495899857bc17fe2b3abb598b32ec25f7b1e1d7"
+        ".superdesign/design-system.md": "a1fbd285f8851b79e5ce9fc9c59e499ed9f81af2e71eb02428c70694adda38df",
+        "frontend/app/app.vue": "6d052c3588846ef05a80e141a25e59e0b9e34587fe076965754e9766a6b4472f",
+        "frontend/app/components/CaseStudyPanel.vue": "aaf6cd7107aab252413025311ebe2cb1772cd4842819f4e87e50eb4cc644ab5b",
+        "frontend/app/components/AppHeader.vue": "8a78fa649a7c19e46ab9e4e0488eabdacc2edbcafb3de6228bef6c0cd400f8e7",
+        "frontend/app/components/ConversationWorkspace.vue": "b12f8d43a5697785f1cdbc71d97404d3dc301ee6905cd62f3e6ed3869ad18f82",
+        "frontend/app/components/ConversationTurn.vue": "6a0a085697c06a8730e06bef844a01a7df09b6d3d98e51f2b9b03449d96dd2e4",
+        "frontend/app/components/StudioComposer.vue": "3a81292aa0c253b35af06bc59f8e8be3e0f1df5ccb5221b5b511fd45cea248ac",
+        "frontend/app/components/JobAttachmentSheet.vue": "1d4ff5d56fb37da292c5365b3c94eee5da694cde4d780589cd529be9fbee9c21",
+        "frontend/app/components/PromptTrace.vue": "39680d2bb52e35bed729250c4c3a7b14e13ed19dbe4d01d13b956b59b857b07a",
+        "frontend/app/assets/css/main.css": "09d728b40e02397bfb6daaec76e850f29d4ebb3ce7bbb913bf6b3fb6ff879f73"
       },
-      "components": [
-        {
-          "name": "AppHeader",
-          "id": "1f68c055-c82e-4ee5-8da1-d35eb8d46830",
-          "sourcePath": "frontend/app/components/AppHeader.vue"
-        },
-        {
-          "name": "SystemContextRail",
-          "id": "2ba6cdad-db87-4849-a394-820cb8db7d05",
-          "sourcePath": "frontend/app/components/SystemContextRail.vue"
-        }
-      ],
+      "components": [],
       "drafts": {
-        "fd536dc8-9ad8-4a7b-a622-3910dffe9f18": {
-          "title": "Lucas Studio — Header Availability Status",
-          "visualDirection": "Editorial header badge with heartbeat availability states",
-          "parentDraftId": "a3619462-2167-4525-8140-aa867873b039",
-          "currentVersion": 4
+        "bed58d15-f24d-49a8-a287-1ffc2ef60397": {
+          "title": "Asterra Bank — AI Banking Assistant Start",
+          "visualDirection": "Asterra cobalt split-screen banking case study",
+          "currentVersion": 15
         }
       },
-      "updatedAt": "2026-08-21T07:01:53Z"
+      "updatedAt": "2026-08-22T07:53:39Z"
     }
   }
 }

@@ -1,44 +1,59 @@
-# Lucas AI Portfolio Design System
+# Asterra Bank AI Case Study — Design System
 
-## Product and experience
+## Product context
 
-A single-page, ephemeral portfolio chat for visitors exploring Lucas van der Kleij’s engineering work and approach. The chat transcript is the primary reading surface. A fixed composer sits above the lower edge; a collapsible system-context rail explains model, sources, tools, and execution metadata. User prompts must read immediately as user-authored, while assistant answers retain the editorial document style.
+A fictional European banking assistant case study by Lucas van der Kleij. The interface demonstrates customer-aware guidance while making it explicit that customer data, products, fees, projections, and actions are illustrative.
+
+The single route uses a desktop 35%/65% split:
+
+- Left: independently scrollable case-study document and fictional CRM-style customer record.
+- Right: premium customer-facing banking chat with an integrated Asterra toolbar, an opening Alex message, an intentionally spacious transcript, and a bottom composer.
+- Mobile: the document and assistant stack vertically without horizontal overflow.
 
 ## Visual direction
 
-Keep the existing calm newspaper/editorial character. The surface is warm paper, not a generic white SaaS dashboard. Use restrained blue, green, gold, and clay accents. Chat conventions may inform placement and shape, but should be translated into this portfolio’s warm, quiet visual language.
+Calm, contemporary European banking. Use cool canvas surfaces, vivid cobalt for brand and action, restrained violet/aqua for data and process states, precise hairlines, generous whitespace, compact oval controls, and rounded white structural surfaces. Avoid gradients, glassmorphism, neon, stock photography, ornamental AI imagery, trading-terminal density, and heavy shadows.
 
 ## Tokens
 
-- Background `--paper: #f6f0df`
-- Surface `--fresh: #fffdf7`
-- Primary text `--ink: #1e241f`
-- Secondary text `--faded: #545b53`
-- Border `--sage: #8a8f84`
-- Primary accent `--blue: #246b85`; tint `--blue-soft: #e5f0f4`
-- Success `--green: #356f58`; tint `--green-soft: #e5f1e9`
-- Highlight `--acid: #f0d34a`; dark gold `--gold: #b08a00`
-- Warning `--clay: #b6533d`; tint `--clay-soft: #f6e3dc`
+### Colors
 
-## Typography
+- Canvas / paper: #F5F7FF
+- Surface: #FFFFFF
+- Subtle surface: #EEF1FF
+- Primary ink: #111629
+- Secondary ink: #35405C
+- Muted ink: #65708B
+- Cobalt action: #2F43D8
+- Bright cobalt: #5267FF
+- Soft cobalt: #E7EBFF
+- Violet: #7447E8; soft violet: #F0E9FF
+- Aqua: #087F91; bright aqua: #27C4D4; soft aqua: #DCF7FA
+- Hairline: #D8DEEE; strong hairline: #AAB4D2
+- Warning: #8B5C12 on #F8EED8
+- Error: #8B342F on #F7E7E5
 
-- Inter: prompts, body content, controls
-- IBM Plex Mono: compact labels, metadata, counters
-- DM Serif Display: portfolio identity and editorial assistant headings
-- Desktop chat copy: 18px with roughly 1.55–1.6 line height; mobile: 16px
+### Typography
 
-## Layout and components
+- Display/headings/brand: Space Grotesk, 600–700
+- Body and financial values: Inter, 400–700
+- Metadata and evidence labels: JetBrains Mono, 500
+- Use tabular numerals for financial and timestamp values.
 
-- Desktop transcript max width 820px; 760px below 1180px; 16px side gutters on mobile.
-- User prompts should be right-aligned as compact content-sized bubbles, maximum 70–75% of transcript width. Use a subtle warm neutral or pale blue surface, dark ink text, and 18–22px rounding. Avoid loud borders or shadows.
-- The `YOU / NN` label belongs with the bubble and aligns to its right edge; keep it legible but subordinate.
-- Assistant identity and answers remain left aligned, full reading width, unboxed, and editorial.
-- Preserve 32px separation inside a turn and 72–96px between turns.
-- Attachments remain visually attached to the user bubble and must not overflow.
-- On mobile, user bubbles may grow to roughly 88% width; prompts and metadata must wrap safely.
-- Preserve accessible focus rings, contrast, semantic order, and reduced-motion behavior.
+### Shape and elevation
 
-## Motion
+- Main assistant workspace: 24px radius, restrained 0 8px 28px rgba(17,22,41,.08) shadow.
+- Composer: 24px radius.
+- Compact controls and status chips: fully rounded.
+- Supporting sheets/panels: 12–18px radius.
+- Use 1px hairlines and no decorative borders or divider at the 35%/65% seam.
 
-Use the current 160–340ms transitions and restrained easing. No new decorative animation is needed for prompt alignment.
+### Interaction and accessibility
+
+- Minimum interactive target: 44px.
+- Visible 2px cobalt focus ring with offset.
+- Status meaning must include text, not color alone.
+- Motion is limited to 160–200ms state transitions and subtle activity pulses.
+- Disable effective animation for prefers-reduced-motion.
+- Preserve semantic headings, labels, live regions, cancellation, retry, and keyboard submission.
 

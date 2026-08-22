@@ -12,10 +12,10 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Lucas van der Kleij — AI Engineer Studio',
+      title: 'Asterra Bank AI Assistant — A Case Study by Lucas van der Kleij',
       meta: [
-        { name: 'description', content: 'A grounded AI portfolio and conversation studio by AI engineer Lucas van der Kleij.' },
-        { name: 'theme-color', content: '#F6F0DF' }
+        { name: 'description', content: 'A fictional European AI banking assistant case study by Lucas van der Kleij.' },
+        { name: 'theme-color', content: '#F5F7FF' }
       ]
     }
   }

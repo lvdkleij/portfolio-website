@@ -1,34 +1,41 @@
 # Extractable Components
 
-## Layout components
-
 ## AppHeader
+
 - Source: `frontend/app/components/AppHeader.vue`
 - Category: layout
-- Description: Shared top navigation and portfolio identity bar.
-- Extractable props: `contextOpen` (boolean, default: true)
-- Hardcoded: Identity text, Work and Résumé links, grounded badge, CSS classes
+- Description: Integrated Asterra brand toolbar and heartbeat state.
+- Extractable props: `agentState` (connecting/ready/stopped)
+- Hardcoded: Asterra mark, brand, demo label, Help and Close controls
 
-## SystemContextRail
-- Source: `frontend/app/components/SystemContextRail.vue`
+## CaseStudyPanel
+
+- Source: `frontend/app/components/CaseStudyPanel.vue`
 - Category: layout
-- Description: Collapsible runtime metadata rail at the right side of the app.
-- Extractable props: `open` (boolean, default: true)
-- Hardcoded: Section labels, metadata structure, status colors, CSS classes
+- Description: Editorial product explanation and fictional customer record.
+- Extractable props: none
+- Hardcoded: all case-study and fictional customer copy
 
-## Basic components
+## StudioComposer
+
+- Source: `frontend/app/components/StudioComposer.vue`
+- Category: basic
+- Description: Persistent Asterra message composer with context attachment and streaming controls.
+- Extractable props: `state` (chat state)
+- Hardcoded: Alex labels, paperclip/send/stop icons, character-limit presentation
 
 ## ConversationTurn
+
 - Source: `frontend/app/components/ConversationTurn.vue`
 - Category: basic
-- Description: Reusable chat turn with user prompt followed by assistant response.
-- Extractable props: `label` (string, default: "YOU / 01")
-- Hardcoded: `LUCAS / AI` assistant identity and CSS classes
+- Description: Customer prompt and Asterra response presentation shell.
+- Extractable props: `label` (string)
+- Hardcoded: Alex identity, Asterra avatar, slot structure
 
 ## PromptTrace
+
 - Source: `frontend/app/components/PromptTrace.vue`
 - Category: basic
-- Description: Collapsible server-reported execution status and stage list.
-- Extractable props: `state`, `durationMs`, `sourceCount`
-- Hardcoded: Status wording, activity bars, CSS classes
-
+- Description: Expandable server execution metadata.
+- Extractable props: `state`, `steps`, `durationMs`, `sourceCount`, `usage`
+- Hardcoded: summary vocabulary and disclosure text

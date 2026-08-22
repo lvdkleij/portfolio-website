@@ -35,12 +35,12 @@ function attachRole() {
   error.value = ''
   const text = pastedText.value.trim()
   if (!text) {
-    error.value = 'Paste a job description before attaching it.'
+    error.value = 'Paste supporting context before attaching it.'
     pasteInput.value?.focus()
     return
   }
 
-  const firstLine = text.split('\n').find(line => line.trim())?.trim() ?? 'Pasted job description'
+  const firstLine = text.split('\n').find(line => line.trim())?.trim() ?? 'Pasted context'
   emit('attach', {
     id: createId(),
     source: 'paste',
@@ -66,10 +66,10 @@ onMounted(() => nextTick(() => firstMenuItem.value?.focus()))
         <h3 :id="titleId">Add</h3>
         <button type="button" aria-label="Close add menu" @click="$emit('close')">×</button>
       </header>
-      <div class="add-menu-list" role="menu" aria-label="Add job context">
+      <div class="add-menu-list" role="menu" aria-label="Add supporting context">
         <button ref="firstMenuItem" type="button" role="menuitem" @click="showPaste">
           <span class="add-menu-icon" aria-hidden="true">¶</span>
-          <span><strong>Paste job description</strong><small>Up to 4,000 characters</small></span>
+          <span><strong>Paste supporting context</strong><small>Up to 4,000 characters</small></span>
         </button>
         <button type="button" role="menuitem" disabled aria-disabled="true" title="File support is coming later">
           <span class="add-menu-icon" aria-hidden="true">↥</span>
@@ -85,19 +85,19 @@ onMounted(() => nextTick(() => firstMenuItem.value?.focus()))
     <template v-else>
       <header class="add-editor-header">
         <button type="button" aria-label="Back to add menu" @click="showMenu">←</button>
-        <h3 :id="titleId">Paste job description</h3>
+        <h3 :id="titleId">Paste supporting context</h3>
         <button type="button" aria-label="Close add menu" @click="$emit('close')">×</button>
       </header>
 
       <div class="job-sheet-panel">
-        <label for="job-description">Job description</label>
+        <label for="job-description">Supporting context</label>
         <textarea
           id="job-description"
           ref="pasteInput"
           v-model="pastedText"
           rows="4"
           maxlength="4000"
-          placeholder="Paste the role description…"
+          placeholder="Paste information for Alex to consider…"
           @input="error = ''"
         />
       </div>
@@ -105,7 +105,7 @@ onMounted(() => nextTick(() => firstMenuItem.value?.focus()))
       <p v-if="error" class="job-sheet-error" role="alert">{{ error }}</p>
       <footer class="job-sheet-footer compact">
         <p>Sent with the chat request · not saved by this site</p>
-        <button class="attach-role" type="button" @click="attachRole">Attach</button>
+        <button class="attach-role" type="button" @click="attachRole">Attach context</button>
       </footer>
     </template>
   </section>

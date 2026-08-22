@@ -142,7 +142,7 @@ async function scrollToMessage(messageId: string, target: 'prompt' | 'response',
 
   const scrollerRect = scroller.getBoundingClientRect();
   const anchorRect = anchor.getBoundingClientRect();
-  const composerClearance = window.innerWidth <= 640 ? 220 : 260;
+  const composerClearance = window.innerWidth <= 640 ? 136 : 128;
   const viewportTop = scrollerRect.top + 28;
   const viewportBottom = scrollerRect.bottom - composerClearance;
   const currentTop = scroller.scrollTop;
@@ -244,44 +244,42 @@ onBeforeUnmount(stop);
   <div id="top" class="conversation-workspace">
     <main
       ref="scrollArea"
-      class="transcript-scroll"
-      aria-label="Conversation with Lucas AI"
+      class="conversation-scroll"
+      aria-label="Conversation with Alex, the Asterra assistant"
       @wheel.passive="pauseStreamFollow"
       @touchstart.passive="pauseStreamFollow"
       @pointerdown="pauseStreamFollow"
     >
-      <div v-if="guestTurns.length === 0" class="empty-chat">
-        <div class="empty-chat-mark" aria-hidden="true">
-          <i class="empty-chat-edge edge-one" />
-          <i class="empty-chat-edge edge-two" />
-          <i class="empty-chat-edge edge-three" />
-          <i class="empty-chat-node node-blue" />
-          <i class="empty-chat-node node-green" />
-          <i class="empty-chat-node node-gold" />
-        </div>
-        <h1>Ask about Lucas’s work, experience, or approach.</h1>
-      </div>
+      <div class="conversation-content">
+        <section class="assistant-opening">
+          <div class="assistant-avatar" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M16 3.5 19.2 12.8 28.5 16l-9.3 3.2L16 28.5l-3.2-9.3L3.5 16l9.3-3.2L16 3.5Z" stroke="currentColor" stroke-width="1.5" />
+              <circle cx="16" cy="16" r="3" fill="currentColor" />
+            </svg>
+          </div>
+          <div>
+            <p class="assistant-label">Alex · Asterra assistant</p>
+            <p class="opening-copy">Good morning, Lucas. I’m Alex, your Asterra assistant. What can I help you with today?</p>
+          </div>
+        </section>
 
-      <div class="transcript">
         <div class="guest-messages" aria-live="polite" aria-relevant="additions text">
           <ConversationTurn
             v-for="(turn, index) in guestTurns"
             :key="turn.id"
-            class="guest-turn"
             :data-message-id="turn.id"
-            :label="`YOU / ${String(index + 1).padStart(2, '0')}`"
+            :label="`You · ${String(index + 1).padStart(2, '0')}`"
           >
             <template #prompt>
               <span>{{ turn.user.content }}</span>
-              <span v-if="turn.attachment" class="turn-attachment"> <b>TXT</b>{{ turn.attachment.label }} </span>
+              <span v-if="turn.attachment" class="turn-attachment"><b>TXT</b>{{ turn.attachment.label }}</span>
             </template>
 
             <template #answer>
               <div v-if="turn.state === 'connecting' && !turn.response" class="thinking" role="status">
                 <span class="thinking-dots" aria-hidden="true"><i /><i /><i /></span>
-                <span>{{
-                  coldStart && activeTurnId === turn.id ? 'Starting the assistant' : 'Connecting to the assistant'
-                }}</span>
+                <span>{{ coldStart && activeTurnId === turn.id ? 'Starting Alex' : 'Connecting to Alex' }}</span>
               </div>
 
               <div
@@ -294,9 +292,7 @@ onBeforeUnmount(stop);
 
               <div v-if="turn.state === 'error' && turn.error" class="chat-response-state error" role="alert">
                 <span>{{ turn.error.message }}</span>
-                <small v-if="turn.error.retryAfterSeconds"
-                  >Try again in about {{ turn.error.retryAfterSeconds }} seconds.</small
-                >
+                <small v-if="turn.error.retryAfterSeconds">Try again in about {{ turn.error.retryAfterSeconds }} seconds.</small>
                 <button v-if="turn.error.retryable" type="button" @click="retryTurn(turn)">Retry</button>
               </div>
 

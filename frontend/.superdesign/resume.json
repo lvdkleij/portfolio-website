@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "asterra-investment-recommendation": {
+      "targetKind": "new-ui",
+      "projectId": "f48fbb8b-d667-47db-ab80-030770ac89bb",
+      "activeDraftId": "bed58d15-f24d-49a8-a287-1ffc2ef60397",
+      "designSystemPath": ".superdesign/design-system.md",
+      "referenceIds": [
+        "1ecbed5e-103d-4d33-8d27-49b7a6a806e2",
+        "30e3a369-84b9-441e-bc32-fef3caeaebfc"
+      ],
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        ".superdesign/init/theme.md:1:84"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "e26606adbd25b686265c7a07a8f7d019f5dc09f8196adf91e4d3e45ef10224a3",
+        ".superdesign/init/theme.md": "56fa575e9e4ebffc5b89c917bb683afe93bdad9e5a87fc895035f302d225b9b1"
+      },
+      "components": [],
+      "drafts": {
+        "bed58d15-f24d-49a8-a287-1ffc2ef60397": {
+          "title": "Asterra Bank — AI Banking Assistant Start",
+          "visualDirection": "35/65 split with a markdown-style case-study explanation and expanded CRM-style fictional customer record on the left, plus the unchanged Alex chat start on the right",
+          "currentVersion": 15
+        }
+      },
+      "updatedAt": "2026-08-22T07:30:11Z"
+    }
+  }
+}
