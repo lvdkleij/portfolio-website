@@ -50,7 +50,6 @@ const {
   requestId,
   model,
   durationMs,
-  coldStart,
   start,
   stop,
 } = useChatStream();
@@ -276,9 +275,13 @@ onBeforeUnmount(stop);
             </template>
 
             <template #answer>
-              <div v-if="turn.state === 'connecting' && !turn.response" class="thinking" role="status">
+              <div
+                v-if="turn.state === 'connecting' && !turn.response"
+                class="thinking"
+                role="status"
+                aria-label="Alex is thinking"
+              >
                 <span class="thinking-dots" aria-hidden="true"><i /><i /><i /></span>
-                <span>{{ coldStart && activeTurnId === turn.id ? 'Starting Alex' : 'Connecting to Alex' }}</span>
               </div>
 
               <div

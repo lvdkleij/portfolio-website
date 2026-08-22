@@ -536,11 +536,6 @@ textarea::-webkit-scrollbar-thumb {
 .thinking {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--ink-soft);
-  font: 500 10px/1 'JetBrains Mono', monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .thinking-dots {
@@ -838,8 +833,9 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .add-menu-list strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1;
 }
 
 .add-menu-list small {

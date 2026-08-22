@@ -880,8 +880,9 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .add-menu-list strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1;
 }
 .add-menu-list small {
   color: var(--ink-soft);

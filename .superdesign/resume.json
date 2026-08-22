@@ -18,12 +18,12 @@
         "frontend/app/components/JobAttachmentSheet.vue",
         "frontend/app/components/PromptTrace.vue",
         "frontend/app/assets/css/main.css:1:380",
-        "frontend/app/assets/css/main.css:406:699",
-        "frontend/app/assets/css/main.css:991:1204",
-        "frontend/app/assets/css/main.css:1329:1520"
+        "frontend/app/assets/css/main.css:406:700",
+        "frontend/app/assets/css/main.css:992:1205",
+        "frontend/app/assets/css/main.css:1330:1521"
       ],
       "fingerprints": {
-        ".superdesign/design-system.md": "28a76a34862a4def21d52e212b5c9095bf64bc3511b880b540fef71f06b8a5b6",
+        ".superdesign/design-system.md": "41c8ef91e90c723a040338c4f55ff4c059123758c5492121b6a6d53ef16d1dfc",
         "frontend/app/app.vue": "6d052c3588846ef05a80e141a25e59e0b9e34587fe076965754e9766a6b4472f",
         "frontend/app/components/CaseStudyPanel.vue": "aaf6cd7107aab252413025311ebe2cb1772cd4842819f4e87e50eb4cc644ab5b",
         "frontend/app/components/AppHeader.vue": "8a78fa649a7c19e46ab9e4e0488eabdacc2edbcafb3de6228bef6c0cd400f8e7",
@@ -32,17 +32,17 @@
         "frontend/app/components/StudioComposer.vue": "3a81292aa0c253b35af06bc59f8e8be3e0f1df5ccb5221b5b511fd45cea248ac",
         "frontend/app/components/JobAttachmentSheet.vue": "1d4ff5d56fb37da292c5365b3c94eee5da694cde4d780589cd529be9fbee9c21",
         "frontend/app/components/PromptTrace.vue": "39680d2bb52e35bed729250c4c3a7b14e13ed19dbe4d01d13b956b59b857b07a",
-        "frontend/app/assets/css/main.css": "6172eafbd0064416399a0716e942816bc7804050da233ed53c61da5804809198"
+        "frontend/app/assets/css/main.css": "957fcb11e45a4c9c4d8a688ed8e7e795d8e7b5373f1852659d99fc2012bc162d"
       },
       "components": [],
       "drafts": {
         "bed58d15-f24d-49a8-a287-1ffc2ef60397": {
           "title": "Asterra Bank — AI Banking Assistant Start",
           "visualDirection": "Asterra cobalt split-screen banking case study",
-          "currentVersion": 24
+          "currentVersion": 25
         }
       },
-      "updatedAt": "2026-08-22T11:13:00+02:00"
+      "updatedAt": "2026-08-22T11:20:00+02:00"
     }
   }
 }
