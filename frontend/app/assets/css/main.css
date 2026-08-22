@@ -314,7 +314,7 @@ textarea:focus-visible {
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-muted);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -441,31 +441,36 @@ textarea::-webkit-scrollbar-thumb {
 
 .assistant-opening,
 .assistant-message {
+  --assistant-avatar-size: 20px;
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 6px;
 }
 
 .assistant-avatar {
-  width: 40px;
-  height: 40px;
+  width: var(--assistant-avatar-size);
+  height: var(--assistant-avatar-size);
   flex: none;
   display: grid;
   place-items: center;
+  border: 0.75px solid var(--ink);
   border-radius: 50%;
-  background: var(--cobalt-soft);
+  background: transparent;
   color: var(--cobalt);
 }
 
 .assistant-avatar svg {
-  width: 24px;
-  height: 24px;
+  width: 15px;
+  height: 15px;
 }
 
 .assistant-label {
+  min-height: var(--assistant-avatar-size);
   margin: 0;
+  display: flex;
+  align-items: center;
   color: var(--cobalt);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -494,17 +499,6 @@ textarea::-webkit-scrollbar-thumb {
   width: fit-content;
   max-width: min(78%, 620px);
   margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 7px;
-}
-
-.customer-message small {
-  color: var(--ink-soft);
-  font: 500 10px/1 'JetBrains Mono', monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .customer-message > p {
@@ -1458,21 +1452,6 @@ textarea::-webkit-scrollbar-thumb {
 
   .conversation-content {
     padding-top: 22px;
-  }
-
-  .assistant-opening,
-  .assistant-message {
-    gap: 12px;
-  }
-
-  .assistant-avatar {
-    width: 36px;
-    height: 36px;
-  }
-
-  .assistant-avatar svg {
-    width: 21px;
-    height: 21px;
   }
 
   .opening-copy,

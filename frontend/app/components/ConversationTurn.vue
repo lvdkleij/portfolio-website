@@ -1,11 +1,6 @@
-<script setup lang="ts">
-defineProps<{ label: string }>()
-</script>
-
 <template>
   <section class="conversation-turn">
     <div class="customer-message">
-      <small>{{ label }}</small>
       <p><slot name="prompt" /></p>
     </div>
     <div class="assistant-message">
@@ -16,7 +11,7 @@ defineProps<{ label: string }>()
         </svg>
       </div>
       <div class="assistant-message-content">
-        <div class="assistant-label">Alex · Asterra assistant</div>
+        <div class="assistant-label">Alex</div>
         <div class="answer-body"><slot name="answer" /></div>
       </div>
     </div>

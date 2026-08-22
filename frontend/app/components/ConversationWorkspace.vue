@@ -259,17 +259,16 @@ onBeforeUnmount(stop);
             </svg>
           </div>
           <div>
-            <p class="assistant-label">Alex · Asterra assistant</p>
+            <p class="assistant-label">Alex</p>
             <p class="opening-copy">Good morning, Lucas. I’m Alex, your Asterra assistant. What can I help you with today?</p>
           </div>
         </section>
 
         <div class="guest-messages" aria-live="polite" aria-relevant="additions text">
           <ConversationTurn
-            v-for="(turn, index) in guestTurns"
+            v-for="turn in guestTurns"
             :key="turn.id"
             :data-message-id="turn.id"
-            :label="`You · ${String(index + 1).padStart(2, '0')}`"
           >
             <template #prompt>
               <span>{{ turn.user.content }}</span>
@@ -301,14 +300,6 @@ onBeforeUnmount(stop);
                 <button type="button" @click="retryTurn(turn)">Retry</button>
               </div>
 
-              <PromptTrace
-                v-if="turn.state !== 'idle'"
-                :state="turn.state"
-                :steps="turn.trace"
-                :duration-ms="turn.durationMs"
-                :source-count="turn.sources.length"
-                :usage="turn.usage"
-              />
             </template>
           </ConversationTurn>
         </div>

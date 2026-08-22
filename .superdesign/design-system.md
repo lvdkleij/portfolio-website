@@ -45,6 +45,8 @@ Calm, contemporary European banking. Use cool canvas surfaces, vivid cobalt for 
 - Main assistant workspace: 24px radius, restrained 0 8px 28px rgba(17,22,41,.08) shadow.
 - Composer: 24px radius.
 - Compact controls and status chips: fully rounded.
+- Assistant identity: tight 20px transparent circle with a 0.75px black hairline and a 15px monochrome cobalt compass mark; vertically center the 14px “Alex” label against the mark and use a 6px gap.
+- Customer messages: show only the right-aligned message bubble, without numbered “You” metadata.
 - Supporting sheets/panels: 12–18px radius.
 - Use 1px hairlines and no decorative borders or divider at the 35%/65% seam.
 
@@ -56,4 +58,3 @@ Calm, contemporary European banking. Use cool canvas surfaces, vivid cobalt for 
 - Motion is limited to 160–200ms state transitions and subtle activity pulses.
 - Disable effective animation for prefers-reduced-motion.
 - Preserve semantic headings, labels, live regions, cancellation, retry, and keyboard submission.
-
