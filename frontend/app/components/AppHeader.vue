@@ -5,6 +5,8 @@ import type { BackendHeartbeatState } from '~/composables/useBackendHeartbeat'
 const props = defineProps<{ agentState: BackendHeartbeatState }>()
 defineEmits<{ newChat: [] }>()
 
+const SHOW_AGENT_AVAILABILITY = false
+
 const availabilityLabel = computed(() => {
   if (props.agentState === 'connecting') return 'Waking up'
   if (props.agentState === 'ready') return 'Ready'
@@ -25,6 +27,7 @@ const availabilityLabel = computed(() => {
 
     <nav aria-label="Demo actions">
       <span
+        v-if="SHOW_AGENT_AVAILABILITY"
         class="agent-availability"
         :data-state="agentState"
         :aria-label="`AI chat status: ${availabilityLabel}`"

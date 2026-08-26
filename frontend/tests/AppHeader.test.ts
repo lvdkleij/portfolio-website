@@ -10,20 +10,12 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('AppHeader', () => {
-  it.each([
-    ['ready', 'Ready'],
-    ['connecting', 'Waking up'],
-    ['stopped', 'Paused']
-  ] as const)('shows the %s heartbeat state in the header badge', (agentState, label) => {
+  it.each(['ready', 'connecting', 'stopped'] as const)('hides the %s heartbeat state', (agentState) => {
     const wrapper = mount(AppHeader, {
       props: { agentState: agentState as BackendHeartbeatState }
     })
-    const badge = wrapper.get('.agent-availability')
 
-    expect(badge.attributes('data-state')).toBe(agentState)
-    expect(badge.attributes('aria-label')).toBe(`AI chat status: ${label}`)
-    expect(badge.text()).toBe(label)
-    expect(badge.text()).not.toContain('Streaming')
+    expect(wrapper.find('.agent-availability').exists()).toBe(false)
   })
 
   it('resets the demo conversation from the close control', async () => {
