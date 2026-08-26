@@ -6,10 +6,10 @@ import { useBackendHeartbeat } from '~/composables/useBackendHeartbeat'
 let wrapper: VueWrapper | undefined
 let visibilityState: DocumentVisibilityState
 
-function mountHeartbeat(fetcher: typeof fetch) {
+function mountHeartbeat(fetcher: typeof fetch, enabled = false) {
   wrapper = mount(defineComponent({
     setup() {
-      const heartbeat = useBackendHeartbeat({ fetcher })
+      const heartbeat = useBackendHeartbeat({ fetcher, enabled })
       return () => h('div', heartbeat.state.value)
     }
   }))
@@ -34,9 +34,23 @@ afterEach(() => {
 })
 
 describe('useBackendHeartbeat', () => {
-  it('warms immediately and sends heartbeats every 60 seconds while active', async () => {
+  it('does not send heartbeats when disabled by default', async () => {
     const fetcher = vi.fn(async () => new Response(null, { status: 204 }))
     mountHeartbeat(fetcher)
+    await vi.advanceTimersByTimeAsync(5 * 60_000)
+
+    document.dispatchEvent(new PointerEvent('pointerdown'))
+    setVisibility('hidden')
+    setVisibility('visible')
+    await vi.advanceTimersByTimeAsync(5 * 60_000)
+
+    expect(fetcher).not.toHaveBeenCalled()
+    expect(wrapper?.text()).toBe('stopped')
+  })
+
+  it('warms immediately and sends heartbeats every 60 seconds while active', async () => {
+    const fetcher = vi.fn(async () => new Response(null, { status: 204 }))
+    mountHeartbeat(fetcher, true)
     await vi.advanceTimersByTimeAsync(0)
 
     expect(fetcher).toHaveBeenCalledTimes(1)
@@ -55,7 +69,7 @@ describe('useBackendHeartbeat', () => {
       return new Response(null, { status: 204 })
     })
 
-    mountHeartbeat(fetcher)
+    mountHeartbeat(fetcher, true)
     await vi.advanceTimersByTimeAsync(0)
 
     expect(fetcher).toHaveBeenCalledTimes(1)
@@ -75,7 +89,7 @@ describe('useBackendHeartbeat', () => {
       return new Response(null, { status: 204 })
     })
 
-    mountHeartbeat(fetcher)
+    mountHeartbeat(fetcher, true)
     await vi.advanceTimersByTimeAsync(0)
     expect(wrapper?.text()).toBe('ready')
 
@@ -87,7 +101,7 @@ describe('useBackendHeartbeat', () => {
 
   it('stops after ten minutes without activity and activity restarts it immediately', async () => {
     const fetcher = vi.fn(async () => new Response(null, { status: 204 }))
-    mountHeartbeat(fetcher)
+    mountHeartbeat(fetcher, true)
     await vi.advanceTimersByTimeAsync(10 * 60_000)
 
     expect(fetcher).toHaveBeenCalledTimes(10)
@@ -106,7 +120,7 @@ describe('useBackendHeartbeat', () => {
 
   it('renews the inactivity window for keyboard, touch and captured scroll activity', async () => {
     const fetcher = vi.fn(async () => new Response(null, { status: 204 }))
-    mountHeartbeat(fetcher)
+    mountHeartbeat(fetcher, true)
 
     await vi.advanceTimersByTimeAsync(9 * 60_000)
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }))
@@ -121,7 +135,7 @@ describe('useBackendHeartbeat', () => {
 
   it('pauses while hidden and resumes only when the visitor is still recently active', async () => {
     const fetcher = vi.fn(async () => new Response(null, { status: 204 }))
-    mountHeartbeat(fetcher)
+    mountHeartbeat(fetcher, true)
     await vi.advanceTimersByTimeAsync(0)
 
     setVisibility('hidden')
@@ -150,7 +164,7 @@ describe('useBackendHeartbeat', () => {
     const fetcher = vi.fn((_input: RequestInfo | URL, init?: RequestInit) => new Promise<Response>((_resolve, reject) => {
       init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')))
     }))
-    mountHeartbeat(fetcher)
+    mountHeartbeat(fetcher, true)
     await vi.advanceTimersByTimeAsync(2 * 60_000)
 
     expect(fetcher).toHaveBeenCalledTimes(1)

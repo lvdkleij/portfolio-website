@@ -7,6 +7,7 @@ type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Respons
 type UseBackendHeartbeatOptions = {
   endpoint?: string
   fetcher?: Fetcher
+  enabled?: boolean
   heartbeatIntervalMs?: number
   inactivityTimeoutMs?: number
   now?: () => number
@@ -20,6 +21,7 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
   const state = ref<BackendHeartbeatState>('stopped')
   const endpoint = options.endpoint ?? '/api/heartbeat'
   const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis)
+  const enabled = options.enabled ?? false
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? DEFAULT_HEARTBEAT_INTERVAL_MS
   const inactivityTimeoutMs = options.inactivityTimeoutMs ?? DEFAULT_INACTIVITY_TIMEOUT_MS
   const now = options.now ?? Date.now
@@ -116,7 +118,7 @@ export function useBackendHeartbeat(options: UseBackendHeartbeatOptions = {}) {
   }
 
   function start() {
-    if (started) return
+    if (!enabled || started) return
 
     started = true
     lastActivityAt = now()
