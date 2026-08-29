@@ -22,9 +22,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      title: 'Lucas van der Kleij — AI Engineer',
+      title: 'Lucas van der Kleij — Software Engineer',
       meta: [
-        { name: 'description', content: 'Lucas van der Kleij — AI engineer and product-minded developer building clear, trustworthy digital products.' }
+        { name: 'description', content: 'Software engineer focused on backend systems and architecture, with frontend experience and a growing interest in AI.' }
       ]
     }
   }
