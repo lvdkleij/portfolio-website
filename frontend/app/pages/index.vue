@@ -1,9 +1,9 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Lucas van der Kleij — AI Engineer',
-  description: 'Lucas van der Kleij — AI engineer and product-minded developer building clear, trustworthy digital products.',
-  ogTitle: 'Lucas van der Kleij — AI Engineer',
-  ogDescription: 'AI engineer and product-minded developer building clear, trustworthy digital products.',
+  title: 'Lucas van der Kleij — Software Engineer',
+  description: 'Software engineer focused on backend systems and architecture, with frontend experience and a growing interest in AI.',
+  ogTitle: 'Lucas van der Kleij — Software Engineer',
+  ogDescription: 'Backend-focused software engineer with experience in architecture, frontend development, and a growing interest in AI.',
   ogType: 'website'
 })
 
@@ -44,11 +44,11 @@ useHead({
           <div class="portfolio-hero__portrait">
             <img src="/images/lucas-portrait.png" alt="Portrait of Lucas van der Kleij">
           </div>
-          <p class="portfolio-kicker">AI engineer · Product-minded developer</p>
+          <p class="portfolio-kicker">Software engineer · Backend & architecture</p>
           <h1 id="portfolio-hero-title">Lucas van<br>der Kleij</h1>
-          <p class="portfolio-hero__intro">I design and engineer thoughtful AI products where technical depth meets human clarity.</p>
-          <a class="portfolio-primary-action" href="#work">
-            Explore selected work
+          <p class="portfolio-hero__intro">I’m a software engineer focused on backend systems and architecture, with frontend experience and a growing interest in AI.</p>
+          <a class="portfolio-primary-action" href="#about">
+            More about me
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M7 17h10V7" /></svg>
           </a>
         </div>
@@ -60,7 +60,7 @@ useHead({
       <section id="manifesto" class="portfolio-section portfolio-manifesto" aria-labelledby="manifesto-title">
         <div class="portfolio-container">
           <p class="portfolio-section-label">01 / Approach</p>
-          <h2 id="manifesto-title">I turn complex AI systems into <em>clear products</em> people can understand—and build the foundations that make them <em>worthy of trust.</em></h2>
+          <h2 id="manifesto-title">I build dependable software from the backend out—shaping <em>clear architectures</em>, robust services, and thoughtful interfaces, while exploring where <em>AI can add real value.</em></h2>
         </div>
       </section>
 
@@ -69,82 +69,27 @@ useHead({
           <div class="portfolio-section-heading">
             <div>
               <p class="portfolio-section-label">02 / Selected work</p>
-              <h2 id="work-title">Ideas made tangible.</h2>
+              <h2 id="work-title">Coming soon.</h2>
             </div>
-            <p>Selected case studies and capability-led explorations across AI, product, and infrastructure.</p>
+            <p>I’m putting this section together and will add projects when there’s something worth sharing.</p>
           </div>
-
-          <article class="portfolio-project">
-            <div class="portfolio-project__visual portfolio-project__visual--asterra" aria-hidden="true">
-              <div class="portfolio-asterra-mockup">
-                <div class="portfolio-asterra-mockup__top"><strong>Asterra</strong><span>Illustrative assistant</span></div>
-                <div class="portfolio-asterra-mockup__body">
-                  <div class="portfolio-asterra-mockup__rail"><i /><b /><b /><span /><span /></div>
-                  <div class="portfolio-asterra-mockup__chat">
-                    <div><strong>Good morning. How can I help?</strong><p>I can compare options using the information you choose to share.</p><p>Help me understand my savings options.</p></div>
-                    <footer>Ask Alex a question <span>→</span></footer>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="portfolio-project__copy">
-              <span class="portfolio-accent-line" />
-              <p class="portfolio-project__eyebrow">Flagship / Fictional case study</p>
-              <h3>Asterra — AI banking assistant</h3>
-              <p>A fictional European banking-assistant case study exploring customer-aware guidance, permissioned data use, product comparison, and a clear path to human handoff.</p>
-              <p class="portfolio-project__tags">Product design · AI interaction · Front-end systems</p>
-              <NuxtLink class="portfolio-text-link" to="/asterra">
-                View the case study
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
-              </NuxtLink>
-            </div>
-          </article>
-
-          <article class="portfolio-project portfolio-project--reverse">
-            <div class="portfolio-project__copy">
-              <span class="portfolio-accent-line" />
-              <p class="portfolio-project__eyebrow">Selected exploration / Systems</p>
-              <h3>Cloud-native AI infrastructure</h3>
-              <p>Exploring dependable foundations for AI products: observable services, disciplined deployment paths, secure integrations, and infrastructure designed to evolve.</p>
-              <p class="portfolio-project__tags">Microsoft Azure · Software architecture · Operations</p>
-              <a class="portfolio-text-link" href="#contact">Start a conversation <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg></a>
-            </div>
-            <div class="portfolio-project__visual portfolio-project__visual--topology" aria-hidden="true">
-              <div class="portfolio-topology">
-                <header>Service topology <i /></header>
-                <div class="portfolio-topology__flow"><span>Interface</span><b /><span>AI service</span><b /><span>Cloud</span></div>
-                <footer><span>Observable</span><span>Permissioned</span><span>Resilient</span></footer>
-              </div>
-            </div>
-          </article>
-
-          <article class="portfolio-project">
-            <div class="portfolio-project__visual portfolio-project__visual--flow" aria-hidden="true">
-              <div class="portfolio-agent-flow">
-                <span>Intent<i /></span><b>01<br>Understand</b><b>02<br>Clarify</b><strong>03 / Guide with context</strong><span>04 / Confirm control</span><span>05<br>Handoff</span>
-              </div>
-            </div>
-            <div class="portfolio-project__copy">
-              <span class="portfolio-accent-line" />
-              <p class="portfolio-project__eyebrow">Selected exploration / Experience</p>
-              <h3>Human-centred agent experiences</h3>
-              <p>Designing agent interactions that explain their reasoning, respect permissions, preserve user control, and know when a human should take over.</p>
-              <p class="portfolio-project__tags">Interaction design · Responsible AI · Prototyping</p>
-              <a class="portfolio-text-link" href="#contact">Explore an idea together <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg></a>
-            </div>
-          </article>
+          <div class="portfolio-work-coming-soon" aria-label="Selected work coming soon">
+            <span class="portfolio-accent-line" aria-hidden="true" />
+            <p>Selected work</p>
+            <strong>Projects and case studies will appear here in time.</strong>
+          </div>
         </div>
       </section>
 
       <section class="portfolio-section portfolio-capabilities" aria-labelledby="capabilities-title">
         <div class="portfolio-container">
           <p class="portfolio-section-label">03 / Capabilities</p>
-          <h2 id="capabilities-title">Across product and system.</h2>
+          <h2 id="capabilities-title">From backend to architecture.</h2>
           <div class="portfolio-capability-list">
-            <article><span>01</span><h3>AI product engineering</h3><p>From interaction models and prototypes to robust product implementation.</p><small>Build</small></article>
-            <article><span>02</span><h3>Full-stack systems</h3><p>Coherent interfaces, services, integrations, and data flows built as one product.</p><small>Engineer</small></article>
-            <article><span>03</span><h3>Azure infrastructure</h3><p>Cloud foundations shaped around security, observability, and maintainability.</p><small>Operate</small></article>
-            <article><span>04</span><h3>Responsible AI</h3><p>Permission-aware experiences with transparency, control, and human escalation.</p><small>Trust</small></article>
+            <article><span>01</span><h3>Backend engineering</h3><p>Reliable services, APIs, domain models, and integrations built to last.</p><small>Build</small></article>
+            <article><span>02</span><h3>Software architecture</h3><p>Clear boundaries, pragmatic decisions, and systems designed to evolve.</p><small>Shape</small></article>
+            <article><span>03</span><h3>Full-stack development</h3><p>Backend-first development with frontend experience to deliver cohesive products.</p><small>Deliver</small></article>
+            <article><span>04</span><h3>AI exploration</h3><p>Learning and experimenting with AI where it can add meaningful value.</p><small>Explore</small></article>
           </div>
         </div>
       </section>
@@ -153,10 +98,10 @@ useHead({
         <div class="portfolio-container portfolio-about__grid">
           <p class="portfolio-section-label">04 / About</p>
           <div>
-            <h2 id="about-title">Bridging product thinking and engineering craft.</h2>
+            <h2 id="about-title">Backend foundations, architectural thinking, and a practical eye for product.</h2>
             <div class="portfolio-about__copy">
-              <p>I approach AI as a product discipline, not just a model choice. The experience, infrastructure, permissions, and handoffs all shape whether a system is genuinely useful.</p>
-              <p>My work moves between product design and software engineering—turning ambiguity into clear interfaces and durable technical foundations.</p>
+              <p>My experience is primarily in backend software engineering and architecture: designing services, shaping domain models, integrating systems, and making technical choices that hold up over time.</p>
+              <p>I also have frontend experience and enjoy working across the product when needed. Right now, I’m expanding into AI and exploring how it can improve useful, well-engineered software.</p>
             </div>
           </div>
         </div>
@@ -167,12 +112,12 @@ useHead({
           <p class="portfolio-section-label">05 / Contact</p>
           <div class="portfolio-contact__heading">
             <h2 id="contact-title">Let’s build something useful.</h2>
-            <span class="portfolio-contact__cta" aria-disabled="true">Start a conversation <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg></span>
+            <a class="portfolio-contact__cta" href="https://www.linkedin.com/in/lucas-van-der-kleij" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg></a>
           </div>
           <div class="portfolio-contact__cards">
             <div><span class="portfolio-contact__icon">@</span><strong>Email</strong><small>Available on request</small></div>
-            <div><span class="portfolio-contact__icon">in</span><strong>LinkedIn</strong><small>Profile link forthcoming</small></div>
-            <div><span class="portfolio-contact__icon">git</span><strong>GitHub</strong><small>Profile link forthcoming</small></div>
+            <a href="https://www.linkedin.com/in/lucas-van-der-kleij" target="_blank" rel="noopener noreferrer" aria-label="Lucas van der Kleij on LinkedIn"><span class="portfolio-contact__icon">in</span><strong>LinkedIn</strong><small>Connect on LinkedIn</small></a>
+            <a href="https://github.com/lvdkleij" target="_blank" rel="noopener noreferrer" aria-label="Lucas van der Kleij on GitHub"><span class="portfolio-contact__icon">git</span><strong>GitHub</strong><small>View GitHub profile</small></a>
           </div>
         </div>
       </section>

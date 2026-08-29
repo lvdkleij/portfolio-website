@@ -10,13 +10,13 @@ interface ChatMessage {
 }
 
 const responses = {
-  asterra: 'Asterra is a fictional European banking-assistant case study exploring customer-aware guidance, permissioned data use, product comparison, and a clear path to human handoff.',
-  work: 'Lucas works on AI products where complex systems need to feel clear and trustworthy—combining product design, full-stack engineering, and cloud infrastructure.',
-  approach: 'Lucas approaches AI as a product discipline. He turns ambiguity into clear interfaces and durable technical foundations, treating the experience, infrastructure, permissions, and handoffs as one product.',
-  capabilities: 'Lucas works across AI product engineering, full-stack systems, and Microsoft Azure infrastructure, with security, observability, and maintainability built into the product from the start.',
-  responsible: 'Responsible AI means permission-aware experiences that explain what is happening, preserve user control, and provide a clear path to a human when automation is no longer the right answer.',
-  contact: 'Lucas’s contact details and profile links are being finalized. For now, you can explore the Asterra case study and the work highlighted on this page.',
-  fallback: 'I can tell you about Lucas’s selected work, Asterra, his approach, capabilities, responsible AI, or how to get in contact.'
+  asterra: 'Asterra is a fictional banking-assistant demo Lucas built while exploring AI interaction patterns. It is an experiment, not client work.',
+  work: 'Lucas is still putting together his selected-work section and will add projects when there is something worth sharing.',
+  approach: 'Lucas is backend-first and architecture-minded. He focuses on clear boundaries, dependable services, pragmatic technical decisions, and a coherent product around them.',
+  capabilities: 'Lucas’s strongest experience is backend engineering and software architecture. He also has frontend experience and is currently expanding into applied AI.',
+  responsible: 'As Lucas gets further into AI, he is interested in systems that are transparent, respect user control, and use automation only where it adds real value.',
+  contact: 'You can connect with Lucas through LinkedIn or view his work on GitHub using the links in the contact section.',
+  fallback: 'I can tell you about Lucas’s backend and architecture experience, his approach, frontend background, AI journey, selected-work plans, or contact links.'
 } as const
 
 const expanded = ref(true)
@@ -37,7 +37,7 @@ function responseFor(question: string): string {
   if (/asterra|bank|banking/.test(normalized)) return responses.asterra
   if (/responsible|trust|permission|transparent|human handoff|safe|ethic/.test(normalized)) return responses.responsible
   if (/contact|email|linkedin|github|hire|collaborat|reach/.test(normalized)) return responses.contact
-  if (/capabilit|skill|technical|technology|tech stack|full.?stack|azure|cloud|infrastructure|engineer/.test(normalized)) return responses.capabilities
+  if (/background|backend|architecture|capabilit|skill|technical|technology|tech stack|full.?stack|azure|cloud|infrastructure|engineer/.test(normalized)) return responses.capabilities
   if (/approach|process|how (does|do|lucas)|method|work style|product thinking/.test(normalized)) return responses.approach
   if (/work|project|portfolio|case stud|experience|build/.test(normalized)) return responses.work
 
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
       </div>
 
       <div v-if="messages.length === 1" class="portfolio-assistant__suggestions" aria-label="Suggested questions">
-        <button type="button" :disabled="thinking" @click="ask('Tell me about Lucas’s selected work')">Selected work</button>
+        <button type="button" :disabled="thinking" @click="ask('Tell me about Lucas’s background')">Lucas’s background</button>
         <button type="button" :disabled="thinking" @click="ask('How does Lucas work?')">How Lucas works</button>
       </div>
 

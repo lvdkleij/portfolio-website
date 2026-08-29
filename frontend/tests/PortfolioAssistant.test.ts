@@ -34,13 +34,13 @@ describe('PortfolioAssistant', () => {
   })
 
   it.each([
-    ['Tell me about Asterra', 'fictional European banking-assistant'],
-    ['What work has Lucas done?', 'complex systems need to feel clear and trustworthy'],
-    ['What is his approach?', 'approaches AI as a product discipline'],
-    ['What are his technical capabilities?', 'Microsoft Azure infrastructure'],
-    ['How do you think about responsible AI?', 'preserve user control'],
-    ['How can I contact Lucas?', 'contact details and profile links are being finalized'],
-    ['What is his favorite sandwich?', 'selected work, Asterra, his approach']
+    ['Tell me about Asterra', 'fictional banking-assistant demo'],
+    ['What work has Lucas done?', 'still putting together his selected-work section'],
+    ['What is his approach?', 'backend-first and architecture-minded'],
+    ['What are his technical capabilities?', 'strongest experience is backend engineering'],
+    ['How do you think about responsible AI?', 'respect user control'],
+    ['How can I contact Lucas?', 'connect with Lucas through LinkedIn'],
+    ['What is his favorite sandwich?', 'backend and architecture experience']
   ])('responds locally to “%s”', async (question, expectedResponse) => {
     const fetchSpy = vi.fn()
     vi.stubGlobal('fetch', fetchSpy)
