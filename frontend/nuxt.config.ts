@@ -1,9 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  ssr: false,
+  ssr: true,
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/portfolio.css'],
+  routeRules: {
+    '/': { prerender: true },
+    '/asterra': { ssr: false }
+  },
+  nitro: {
+    prerender: {
+      routes: ['/']
+    }
+  },
   runtimeConfig: {
     public: {
       chatApiUrl: '/api/chat/stream',
@@ -12,10 +21,10 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Asterra Bank AI Assistant — A Case Study by Lucas van der Kleij',
+      htmlAttrs: { lang: 'en' },
+      title: 'Lucas van der Kleij — AI Engineer',
       meta: [
-        { name: 'description', content: 'A fictional European AI banking assistant case study by Lucas van der Kleij.' },
-        { name: 'theme-color', content: '#F5F7FF' }
+        { name: 'description', content: 'Lucas van der Kleij — AI engineer and product-minded developer building clear, trustworthy digital products.' }
       ]
     }
   }

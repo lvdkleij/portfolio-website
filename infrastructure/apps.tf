@@ -206,34 +206,35 @@ variable "cloudflare_zone_id" {
   sensitive = true
 }
 
-resource "cloudflare_dns_record" "frontend_chat" {
+resource "cloudflare_dns_record" "frontend" {
   zone_id = var.cloudflare_zone_id
-  name    = "chat"
-  type    = "CNAME"
-  content = azurerm_container_app.ca_portfolio_frontend_prod.ingress[0].fqdn
+  name    = "@"
+  type    = "A"
+  content = azurerm_container_app_environment.cae_portfolio_prod.static_ip_address
   ttl     = 1
   proxied = true
 }
 
-resource "cloudflare_dns_record" "frontend_chat_verification" {
+resource "cloudflare_dns_record" "frontend_verification" {
   zone_id = var.cloudflare_zone_id
-  name    = "asuid.chat"
+  name    = "asuid"
   type    = "TXT"
   content = azurerm_container_app.ca_portfolio_frontend_prod.custom_domain_verification_id
   ttl     = 300
 }
 
-resource "azurerm_container_app_custom_domain" "frontend_chat" {
-  name             = "chat.${var.domain_name}"
+resource "azurerm_container_app_custom_domain" "frontend" {
+  name             = var.domain_name
   container_app_id = azurerm_container_app.ca_portfolio_frontend_prod.id
+  # The Key Vault-backed Cloudflare origin certificate must include the apex domain.
   container_app_environment_certificate_id = (
     azurerm_container_app_environment_certificate.frontend_origin.id
   )
   certificate_binding_type = "SniEnabled"
 
   depends_on = [
-    cloudflare_dns_record.frontend_chat,
-    cloudflare_dns_record.frontend_chat_verification
+    cloudflare_dns_record.frontend,
+    cloudflare_dns_record.frontend_verification
   ]
 }
 

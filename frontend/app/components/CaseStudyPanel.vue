@@ -24,6 +24,19 @@
 
       <hr>
 
+      <section aria-labelledby="setup-title">
+        <h2 id="setup-title">What I set up</h2>
+        <ul class="demo-capabilities">
+          <li>
+            Provisioned and managed Azure infrastructure using Bicep-based infrastructure as code (IaC), including
+            Azure Functions, Azure DocumentDB, virtual networks, private endpoints, user-assigned managed identities,
+            role-based access control (RBAC), and Azure Blob Storage
+          </li>
+        </ul>
+      </section>
+
+      <hr>
+
       <section aria-labelledby="customer-title">
         <h2 id="customer-title">Fictional customer</h2>
         <dl class="customer-record">
