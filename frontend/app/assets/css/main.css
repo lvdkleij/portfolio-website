@@ -1298,7 +1298,7 @@ textarea::-webkit-scrollbar-thumb {
     height: 100%;
   }
 
-  body {
+  body:has(.asterra-app) {
     overflow: hidden;
   }
 
