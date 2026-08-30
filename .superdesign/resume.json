@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/": {
+      "targetKind": "existing-ui",
+      "projectId": "b9b9538d-b4a6-4d1e-847a-e5ad5461b56f",
+      "baselineDraftId": "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f",
+      "activeDraftId": "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f",
+      "designSystemPath": ".superdesign/design-system.md",
+      "referenceIds": [
+        "fb99df05-8dfa-473c-9cc0-0b97282dc33c"
+      ],
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "frontend/app/pages/index.vue",
+        "frontend/app/app.vue",
+        "frontend/app/assets/css/main.css:1:88",
+        "frontend/app/assets/css/main.css:1508:1516"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "d56ae8656995d89f64cb8385a7aa4ce4ba32a208bd8e6ae98e942fcda6d20fc7",
+        "frontend/app/pages/index.vue": "ef2d7e681a84b481f8f10a28cf41c9549f7d2b1e43950d45ff4650b52e1cd06a",
+        "frontend/app/app.vue": "c3ea2b5873779fc5d429c49fa2776e1c2f80723883c1a5c649eab7247806a479",
+        "frontend/app/assets/css/main.css": "4c88905f0bdf211434cb6bde8258c7dd886f960e902970dc668882c7b2c9b0c0"
+      },
+      "components": [],
+      "contentAssets": {
+        "hero": {
+          "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/projects/b9b9538d-b4a6-4d1e-847a-e5ad5461b56f/content-assets/lucas-desk-scene-upscaled/lucas-desk-scene.png",
+          "nodeId": "fb99df05-8dfa-473c-9cc0-0b97282dc33c"
+        }
+      },
+      "drafts": {
+        "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f": {
+          "title": "Lucas — Quiet desk with minimal menu and AI chat",
+          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high).",
+          "currentVersion": 5
+        }
+      },
+      "updatedAt": "2026-08-30T13:17:51.147Z",
+      "baselineVersion": 1,
+      "review": {
+        "desktop": "1440x900",
+        "mobile": [
+          "390x844",
+          "320x568"
+        ],
+        "noApplicationChanges": true,
+        "chat": "Local mocked text conversation with optional capability overview; no AI integration.",
+        "generationCreditsConsumed": 64.5
+      }
+    }
+  }
+}
