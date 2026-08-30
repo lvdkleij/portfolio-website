@@ -52,8 +52,6 @@ useHead({
 .desk-landing__frame {
   width: 100%;
   height: 100%;
-  /* Limit portrait cropping so the complete desk remains visible on phones. */
-  max-height: calc((100vw - var(--frame-left) - var(--frame-right)) * 1.6);
   overflow: hidden;
   border-radius: clamp(20px, 1.8vw, 32px);
   background: #c5b09a;
