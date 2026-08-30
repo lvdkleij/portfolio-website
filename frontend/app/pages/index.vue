@@ -12,6 +12,8 @@ useSeoMeta({
 })
 
 useHead({
+  htmlAttrs: { class: 'desk-page' },
+  bodyAttrs: { class: 'desk-page' },
   link: [{ rel: 'canonical', href: 'https://lucasvanderkleij.dev/' }],
   meta: [{ name: 'theme-color', content: '#e8e6e1' }]
 })
@@ -78,11 +80,9 @@ onBeforeUnmount(() => {
   place-items: center;
   box-sizing: border-box;
   width: 100%;
-  position: fixed;
-  inset: 0;
-  height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
   padding: var(--frame-top) var(--frame-right) var(--frame-bottom) var(--frame-left);
   background: #e8e6e1;
 }
@@ -138,12 +138,29 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 639px) {
+  :global(html.desk-page),
+  :global(body.desk-page) {
+    background-color: #c5b09a;
+  }
+
   .desk-landing {
+    /* Keep the image in document flow: Safari clips fixed layers at its bars.
+       lvh includes the space exposed when the browser controls retract. */
+    height: 100vh;
+    height: 100lvh;
     padding: 0;
+    background: #c5b09a;
+  }
+
+  .desk-landing__frame {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: auto;
+    border-radius: 0;
   }
 
   .brussels-clock {
-    top: max(12px, env(safe-area-inset-top, 0px));
+    top: calc(12px + env(safe-area-inset-top, 0px));
     padding: 4px 8px;
     gap: 7px;
     border-radius: 6px;
