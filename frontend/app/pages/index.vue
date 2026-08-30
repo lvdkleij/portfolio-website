@@ -78,11 +78,13 @@ onBeforeUnmount(() => {
   place-items: center;
   box-sizing: border-box;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--frame-top) var(--frame-right) var(--frame-bottom) var(--frame-left);
   background: #e8e6e1;
-  position: relative;
 }
 
 .brussels-clock {
