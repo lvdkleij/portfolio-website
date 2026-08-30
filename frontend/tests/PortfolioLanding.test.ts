@@ -50,6 +50,8 @@ describe('portfolio landing page', () => {
       ogImage: 'https://lucasvanderkleij.dev/images/lucas-desk-scene.png'
     }))
     expect(useHead).toHaveBeenCalledWith({
+      htmlAttrs: { class: 'desk-page' },
+      bodyAttrs: { class: 'desk-page' },
       link: [{ rel: 'canonical', href: 'https://lucasvanderkleij.dev/' }],
       meta: [{ name: 'theme-color', content: '#e8e6e1' }]
     })
