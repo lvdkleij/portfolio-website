@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
 useSeoMeta({
   title: 'Lucas van der Kleij — Software Engineer',
   description: 'Software engineer focused on backend systems and architecture, with frontend experience and a growing interest in AI.',
@@ -13,10 +15,43 @@ useHead({
   link: [{ rel: 'canonical', href: 'https://lucasvanderkleij.dev/' }],
   meta: [{ name: 'theme-color', content: '#e8e6e1' }]
 })
+
+const brusselsDisplay = ref('— —:—')
+const brusselsIso = ref('')
+let brusselsTimer: ReturnType<typeof setInterval> | undefined
+
+const brusselsFormatter = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/Brussels',
+  weekday: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23'
+})
+
+function updateBrusselsTime() {
+  const now = new Date()
+  const parts = Object.fromEntries(brusselsFormatter.formatToParts(now).map((part) => [part.type, part.value]))
+  brusselsDisplay.value = `${parts.weekday?.toUpperCase()} ${parts.hour}:${parts.minute}`
+  brusselsIso.value = now.toISOString()
+}
+
+onMounted(() => {
+  updateBrusselsTime()
+  brusselsTimer = setInterval(updateBrusselsTime, 1000)
+})
+
+onBeforeUnmount(() => {
+  if (brusselsTimer) clearInterval(brusselsTimer)
+})
 </script>
 
 <template>
   <main class="desk-landing" aria-label="Lucas van der Kleij">
+    <div class="brussels-clock" role="group" :aria-label="`Local time in Brussels: ${brusselsDisplay}`">
+      <span class="brussels-clock__dot" aria-hidden="true" />
+      <span>BRUSSELS</span>
+      <time :datetime="brusselsIso">{{ brusselsDisplay }}</time>
+    </div>
     <div class="desk-landing__frame">
       <img
         class="desk-landing__image"
@@ -47,6 +82,33 @@ useHead({
   height: 100dvh;
   padding: var(--frame-top) var(--frame-right) var(--frame-bottom) var(--frame-left);
   background: #e8e6e1;
+  position: relative;
+}
+
+.brussels-clock {
+  position: absolute;
+  z-index: 2;
+  top: max(24px, env(safe-area-inset-top, 0px));
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transform: translateX(-50%);
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: #000;
+  color: #f5f5f5;
+  font: 400 11px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.brussels-clock__dot {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-radius: 50%;
+  background: #30d68b;
 }
 
 .desk-landing__frame {
@@ -70,6 +132,20 @@ useHead({
     width: auto;
     max-width: 100%;
     aspect-ratio: 5 / 2;
+  }
+}
+
+@media (max-width: 639px) {
+  .desk-landing {
+    padding: 0;
+  }
+
+  .brussels-clock {
+    top: max(12px, env(safe-area-inset-top, 0px));
+    padding: 4px 8px;
+    gap: 7px;
+    border-radius: 6px;
+    font-size: 10px;
   }
 }
 </style>

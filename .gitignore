@@ -19,3 +19,6 @@ override.tf.json
 # Terraform plans
 *.tfplan
 .ignore
+
+# Temporary Superdesign exports and previews
+.superdesign/tmp/

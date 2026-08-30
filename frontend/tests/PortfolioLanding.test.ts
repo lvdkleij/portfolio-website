@@ -11,11 +11,13 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals())
 
-describe('image-only portfolio landing page', () => {
-  it('renders only the locally hosted desk image in an accessible main landmark', () => {
+describe('portfolio landing page', () => {
+  it('renders the locally hosted desk image and Brussels clock in an accessible main landmark', () => {
     const wrapper = mount(PortfolioLanding)
 
     expect(wrapper.get('main').attributes('aria-label')).toBe('Lucas van der Kleij')
+    expect(wrapper.get('.brussels-clock').text()).toContain('BRUSSELS')
+    expect(wrapper.get('.brussels-clock').attributes('aria-label')).toContain('Local time in Brussels')
     expect(wrapper.findAll('img')).toHaveLength(1)
     expect(wrapper.get('img').attributes()).toMatchObject({
       src: '/images/lucas-desk-scene.png',
@@ -28,14 +30,14 @@ describe('image-only portfolio landing page', () => {
     expect(existsSync(resolve(process.cwd(), 'public/images/lucas-desk-scene.png'))).toBe(true)
   })
 
-  it('has no visible copy, navigation, chat controls or other interactive content', () => {
+  it('keeps the visual page free of navigation, chat controls or other interactive content', () => {
     const wrapper = mount(PortfolioLanding, {
       global: {
         stubs: { PortfolioAssistant: { template: '<div data-test="portfolio-assistant" />' } }
       }
     })
 
-    expect(wrapper.text()).toBe('')
+    expect(wrapper.text()).toContain('BRUSSELS')
     expect(wrapper.find('header, nav, footer, h1, h2, p, a, button, input, textarea, video, canvas').exists()).toBe(false)
     expect(wrapper.find('[data-test="portfolio-assistant"]').exists()).toBe(false)
   })
