@@ -1,4 +1,4 @@
-package eu.roodbaard.aichat.infrastructure.chatclient;
+package eu.roodbaard.aichat.infrastructure.chatclient.config;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;

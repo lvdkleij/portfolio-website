@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import PortfolioLanding from '~/pages/index.vue'
@@ -9,44 +11,45 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals())
 
-describe('portfolio landing page', () => {
-  it('renders the current positioning, coming-soon work state, and profile links', () => {
-    const wrapper = mount(PortfolioLanding, {
-      global: {
-        stubs: {
-          PortfolioAssistant: { template: '<div data-test="portfolio-assistant" />' },
-          NuxtLink: true
-        }
-      }
-    })
+describe('image-only portfolio landing page', () => {
+  it('renders only the locally hosted desk image in an accessible main landmark', () => {
+    const wrapper = mount(PortfolioLanding)
 
-    expect(wrapper.get('h1').text()).toContain('Lucas van')
-    expect(wrapper.get('h1').text()).toContain('der Kleij')
-    expect(wrapper.text()).toContain('Software engineer · Backend & architecture')
-    expect(wrapper.get('#work').text()).toContain('Coming soon.')
-    expect(wrapper.find('.portfolio-project').exists()).toBe(false)
-    expect(wrapper.get('#about').text()).toContain('Backend foundations, architectural thinking')
-    expect(wrapper.get('#contact').text()).toContain('Let’s build something useful.')
-    expect(wrapper.get('a[href="https://www.linkedin.com/in/lucas-van-der-kleij"]').attributes('target')).toBe('_blank')
-    expect(wrapper.get('a[href="https://github.com/lvdkleij"]').attributes('target')).toBe('_blank')
-    expect(wrapper.find('[data-test="portfolio-assistant"]').exists()).toBe(true)
+    expect(wrapper.get('main').attributes('aria-label')).toBe('Lucas van der Kleij')
+    expect(wrapper.findAll('img')).toHaveLength(1)
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: '/images/lucas-desk-scene.png',
+      alt: 'Lucas van der Kleij working on a laptop at a wooden desk, with a lamp and coffee cup, in a warm beige studio.',
+      width: '3344',
+      height: '1882',
+      loading: 'eager',
+      fetchpriority: 'high'
+    })
+    expect(existsSync(resolve(process.cwd(), 'public/images/lucas-desk-scene.png'))).toBe(true)
   })
 
-  it('sets route-specific portfolio metadata', () => {
-    mount(PortfolioLanding, {
+  it('has no visible copy, navigation, chat controls or other interactive content', () => {
+    const wrapper = mount(PortfolioLanding, {
       global: {
-        stubs: {
-          PortfolioAssistant: true,
-          NuxtLink: true
-        }
+        stubs: { PortfolioAssistant: { template: '<div data-test="portfolio-assistant" />' } }
       }
     })
 
+    expect(wrapper.text()).toBe('')
+    expect(wrapper.find('header, nav, footer, h1, h2, p, a, button, input, textarea, video, canvas').exists()).toBe(false)
+    expect(wrapper.find('[data-test="portfolio-assistant"]').exists()).toBe(false)
+  })
+
+  it('keeps route-specific metadata without adding visible text', () => {
+    mount(PortfolioLanding)
+
     expect(useSeoMeta).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Lucas van der Kleij — Software Engineer'
+      title: 'Lucas van der Kleij — Software Engineer',
+      ogImage: 'https://lucasvanderkleij.dev/images/lucas-desk-scene.png'
     }))
-    expect(useHead).toHaveBeenCalledWith(expect.objectContaining({
-      link: [{ rel: 'canonical', href: 'https://lucasvanderkleij.dev/' }]
-    }))
+    expect(useHead).toHaveBeenCalledWith({
+      link: [{ rel: 'canonical', href: 'https://lucasvanderkleij.dev/' }],
+      meta: [{ name: 'theme-color', content: '#e8e6e1' }]
+    })
   })
 })

@@ -1,4 +1,4 @@
-package eu.roodbaard.aichat.infrastructure.chatclient;
+package eu.roodbaard.aichat.infrastructure.chatclient.services;
 
 import eu.roodbaard.aichat.domain.service.ChatClientService;
 import org.springframework.ai.chat.client.ChatClient;
@@ -7,18 +7,13 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
-public class OpenAiChatClientService implements ChatClientService {
+public class LucasAssistantChatClientService implements ChatClientService {
 
     private final ChatClient chatClient;
 
-    public OpenAiChatClientService(@Qualifier("openAiChatClient") ChatClient chatClient) {
+    public LucasAssistantChatClientService(@Qualifier("lucasAssistantChatClient") ChatClient chatClient) {
         this.chatClient = chatClient;
     }
-
-    public String chat(String message) {
-        return this.chatClient.prompt().user(message).call().content();
-    }
-
 
     public Flux<String> stream(String message) {
         return this.chatClient.prompt().user(message).stream().content();
