@@ -9,7 +9,8 @@
       "designSystemPath": ".superdesign/design-system.md",
       "referenceIds": [
         "fb99df05-8dfa-473c-9cc0-0b97282dc33c",
-        "8344187f-a10d-4f85-98fa-274a23323938"
+        "8344187f-a10d-4f85-98fa-274a23323938",
+        "a64223ac-363b-4148-8fa7-7b915338733d"
       ],
       "contextFiles": [
         ".superdesign/design-system.md",
@@ -19,16 +20,20 @@
         "frontend/app/assets/css/main.css:1508:1516",
         "frontend/app/components/QuietDeskOverlay.vue",
         "frontend/app/components/QuietDeskIcon.vue",
-        "frontend/app/utils/quietDeskChat.ts"
+        "frontend/app/utils/quietDeskLayout.ts",
+        "frontend/app/utils/markdown.ts",
+        "frontend/app/composables/useChatStream.ts"
       ],
       "fingerprints": {
         ".superdesign/design-system.md": "ed3e5d03d97f080ef911684d4170579a3d9884dd185416784fc743943aa60f7d",
-        "frontend/app/pages/index.vue": "aa5f1d4847123170a4d8248f7e7e3eeffb487dc2d9f860f7e79c04f7975e1df7",
+        "frontend/app/pages/index.vue": "f8d1670ec764d747c11a1a01656118dda97a2b449ad4ef3b69ab9fb22b619470",
         "frontend/app/app.vue": "c3ea2b5873779fc5d429c49fa2776e1c2f80723883c1a5c649eab7247806a479",
         "frontend/app/assets/css/main.css": "4c88905f0bdf211434cb6bde8258c7dd886f960e902970dc668882c7b2c9b0c0",
-        "frontend/app/components/QuietDeskOverlay.vue": "87fbbc5193742366af14d2729615aeb55072be598b475b8df1842714096dd48b",
-        "frontend/app/components/QuietDeskIcon.vue": "6de5c960e192fcdd82aa71ca41b1db4b8c9b797ba9817801e2f5834055d298dc",
-        "frontend/app/utils/quietDeskChat.ts": "370e88714431fa770a56e85b77757c983705c709e5179db742c6541c27caf1f1"
+        "frontend/app/components/QuietDeskOverlay.vue": "f02726797bd3332a737354fe1f4df8080a7140e035c94f37a09f90de7a57ae1a",
+        "frontend/app/components/QuietDeskIcon.vue": "26bfa49628084d87d794fa3a17aa782b108008fc8ca85fc7ab984d2782bc2830",
+        "frontend/app/utils/quietDeskLayout.ts": "59110dfe71514716a6fc410f7f5d92e7aff618450e2390e1cabb5d4dee6394ab",
+        "frontend/app/utils/markdown.ts": "9e0225eb2d20b17f47c45e60f6ef90be095cb383db857c9118c0f9b9a34b1fbd",
+        "frontend/app/composables/useChatStream.ts": "8fa5cb97762052b23ceb2fd517bfa2ba039f1e27dfb80c321120e3c8012d9e3a"
       },
       "components": [],
       "contentAssets": {
@@ -40,11 +45,11 @@
       "drafts": {
         "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f": {
           "title": "Lucas — Refined quiet-desk typography",
-          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high). v6=approved upright Newsreader 400 name with quieter Inter role/menu/chat, mobile input 16px and otherwise unchanged composition. v7=minimum 44px menu touch target correction. v8=one-second staggered entrance for name, role, About, Contact, and chat, with 8px upward movement, reduced-motion support and immediate completion on focus/open; About copy synchronized and Approach hidden. v9=removed composer focus-within highlight and input focus-visible outline; autofocus, typing, and focus indicators for other controls retained.",
-          "currentVersion": 9
+          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high). v6=approved upright Newsreader 400 name with quieter Inter role/menu/chat, mobile input 16px and otherwise unchanged composition. v7=minimum 44px menu touch target correction. v8=one-second staggered entrance for name, role, About, Contact, and chat, with 8px upward movement, reduced-motion support and immediate completion on focus/open; About copy synchronized and Approach hidden. v9=removed composer focus-within highlight and input focus-visible outline; autofocus, typing, and focus indicators for other controls retained. v10=compact resting chat invitation: 12px Lucas’s AI assistant caption, Ask about Lucas placeholder, 50px composer with 14px corners, and a 32px circular send affordance inside a 44px target that activates for non-whitespace text; all panels, photograph, clock, motion and no-highlight behavior preserved. Design preview only; not yet mirrored into frontend. v11=user-requested personal voice: resting entry is only Ask me anything with no assistant caption, short screens retain an Ask me anything button, chat heading and placeholders match, first-person example replies use the supplied profile facts, repeated assistant labels removed. A small AI-generated replies disclosure is visible only inside chat. Focus returns to a visible control when resizing between input and compact-button layouts. Design preview only; frontend/backend remain unchanged. v12=user-requested spatial conversation: one persistent bottom-centred Ask me anything composer; desktop replies appear in speech bubbles to the left of the head, positioned using the exact photograph cover/crop geometry. Chat is a nonmodal conversation region with no backdrop or focus trap. Tablet/phone and narrow desktop fall back to a compact reading panel above the same composer, with expansion for long conversations and a forced reading layout for short viewports. History survives minimizing, focus avoids reopening the mobile keyboard, input stays 16px, reply motion respects reduced motion, and completed replies use a polite status announcement. Photo/clock/About/Contact remain unchanged; first-person example replies and discreet AI disclosure retained. Design preview only; frontend and backend unchanged. v13=user-approved v12 layout retained with refined conversation scrolling: all messages remain available, an overflow-only hint makes history discoverable, scrolling away from the bottom shows Latest reply, minimizing/reopening preserves the reading offset, and incoming replies only follow while the reader is at the bottom. Hidden panels do not reset scroll state; a small upward scroll stops following; jump-to-latest retains visible keyboard focus. No change to composer or speech-bubble placement. Design preview only; frontend and backend unchanged. v14=desktop portrait-side chat aligns Lucas response bubbles, including Thinking, to the right and visitor prompts to the left. The visitor bubble corner is mirrored to the bottom left; Lucas reply tail continues toward the head. Mobile/tablet styles, scrolling, composer, layout geometry, and all JavaScript remain unchanged. Design preview only; application code unchanged. v15=About and Contact navigation removed. Three clickable prompt bubbles sit directly above the bottom composer: What do you work with?, What's your background?, How can I reach you?. Suggestions disappear while conversation is open and return when minimized; short visible viewports use a horizontally scrollable row, normal phone widths wrap. Clicking submits through the shared form, preserves an existing typed draft, guards pending replies, and focuses a chat control rather than opening the mobile keyboard. Contact replies now contain the original verified LinkedIn/GitHub links instead of referring to the removed menu. Existing photograph, name, role, clock, desktop right/left message alignment and history behavior retained. Design preview only; application source unchanged. v16=visible Scroll through the conversation hint removed. Per user clarification, only desktop portrait-side chat fades whole bubbles uniformly, including borders and tails, instead of applying a mask to a clipped scroll viewport. Real message nodes paint outside the scroll clip while a native spacer retains the conversation history. Oversized desktop messages scroll internally inside an intact outer bubble. Desktop caption/minimize controls sit to the left of the conversation column so they do not overlap fading cards. Compact mobile/tablet chat retains its existing normal-flow scrolling and does not fade. Previous identity, photograph, clock, prompt examples, contact links, composer, and left/right desktop alignment retained. Design preview only; application source unchanged. v17=question/reply exchanges have 32px separation while retaining 12px within a pair. Desktop whole-card opacity now fades progressively with pair distance, keeping the newest exchange clear and shifting the readable area with history scrolling; 180ms opacity easing respects reduced motion. Rounded whole-bubble painting, long-message reading areas and left/right alignment retained. Compact mode gets the larger pair spacing but keeps ordinary non-fading scrolling. Design preview only; application source unchanged.",
+          "currentVersion": 17
         }
       },
-      "updatedAt": "2026-08-31T08:03:20.594234+00:00",
+      "updatedAt": "2026-08-31T15:54:11.929744+00:00",
       "baselineVersion": 1,
       "review": {
         "desktop": "1440x900",
@@ -80,15 +85,171 @@
         "composerFocus": {
           "version": 9,
           "verification": "Browser verified focused chat input and composer have outline-style none and box-shadow none, with INPUT still active."
+        },
+        "chatEntry": {
+          "version": 10,
+          "viewports": [
+            "1440x900",
+            "390x844",
+            "320x568"
+          ],
+          "generationCreditsConsumed": 0,
+          "method": "Direct correction of existing public draft HTML; no repository source uploaded.",
+          "verification": "Browser reviewed desktop and phone layouts without horizontal overflow, 44px caption/send targets, 16px mobile input, disabled blank/whitespace send state, dark filled-input send state, click-to-send/reset, chat autofocus, Escape/close and focus return. Focused inputs and composers retain no outline or shadow. All panel markup and public asset URLs unchanged. Saved HTML equals the reviewed draft.",
+          "implementation": "Design-only. Existing frontend remains on v9."
+        },
+        "personalChat": {
+          "version": 11,
+          "viewports": [
+            "1440x900",
+            "390x844",
+            "320x568"
+          ],
+          "generationCreditsConsumed": 0,
+          "method": "Direct correction of existing public draft HTML; no repository source uploaded.",
+          "verification": "Reviewed desktop input without assistant heading, 16px mobile input, 44px short-screen chat button, first-person welcome/profile example replies, small in-chat AI disclosure, submit/open/close behavior, focus return after a responsive layout change, no horizontal overflow, and no composer/input outlines or shadows. Public asset URLs and About/Contact content unchanged. Saved HTML matches the reviewed draft.",
+          "implementation": "Design-only. Frontend and backend prompt unchanged."
+        },
+        "spatialChat": {
+          "version": 12,
+          "viewports": [
+            "1440x900",
+            "1280x800",
+            "1024x768",
+            "768x1024",
+            "390x844",
+            "320x568",
+            "812x375"
+          ],
+          "generationCreditsConsumed": 0,
+          "method": "Local prototype of the existing public draft, imported as a new version; no private repository source uploaded.",
+          "desktop": "Portrait-side layout requires width >=1100, aspect ratio >4:3, and at least 280px between the identity column and calibrated head anchor. Bubble width <=336px; portrait anchors 2140/840 in the unchanged 3344x1882 image, with cover and 68%/100% object positioning accounted for.",
+          "mobileTablet": "Bottom composer <=560px wide, 16px input, docked scrollable conversation above it; default panel stays below a calibrated face boundary when space permits. Explicit or short-viewport reading mode uses available height. VisualViewport resize/scroll and safe-area insets are handled.",
+          "verification": "Browser reviewed the listed layouts without horizontal overflow, desktop name/head separation, persistent bottom composer, submit and first-person replies, no chat dialog semantics, focused composer without outline/shadow, long-reply scrolling, expand/collapse, minimize/history preservation, and focus recovery when closing About after a viewport resize. Static independent review issues resolved. JavaScript syntax, unique IDs, unchanged image/public URLs and unchanged information-panel markup verified. Saved HTML matches reviewed prototype.",
+          "limitations": "Actual mobile keyboard behavior still requires real-device verification. Design preview uses local example replies, not the production endpoint.",
+          "implementation": "Design-only. Frontend and backend prompt unchanged."
+        },
+        "scrollableHistory": {
+          "version": 13,
+          "viewports": [
+            "1440x900",
+            "768x1024",
+            "390x844"
+          ],
+          "generationCreditsConsumed": 0,
+          "method": "Deterministic refinement of the existing public draft, imported as a new version. No private repository source uploaded.",
+          "verification": "Manually verified native scrolling through multiple turns, small upward scrolls, Latest reply visibility and navigation, preserved reading offsets after minimizing/reopening on desktop and tablet, uninterrupted reading while a sample reply arrived, mobile expansion/collapse, retained message count, and no horizontal overflow. Independent source review completed. Inline JavaScript syntax and unchanged public assets/page content verified; saved HTML matches the reviewed prototype.",
+          "limitations": "Example replies are local to the design preview. Real-device touch and keyboard behavior are not verified.",
+          "implementation": "Design-only. Application code unchanged; implementation version remains 9."
+        },
+        "desktopBubbleAlignment": {
+          "version": 14,
+          "generationCreditsConsumed": 0,
+          "method": "Two narrowly scoped CSS overrides in the existing public draft; no private source uploaded.",
+          "verification": "Browser verified left prompts and right Thinking/completed replies at 1440x900. At 768x1024 and 390x844 the existing compact alignment is unchanged, with no horizontal overflow. Composer still has no outline. Independent selector/corner review completed; all other HTML/CSS and JavaScript remain byte-identical. Saved HTML matches the reviewed preview.",
+          "implementation": "Design-only. Frontend and backend unchanged."
+        },
+        "examplePrompts": {
+          "version": 15,
+          "viewports": [
+            "1440x900",
+            "768x1024",
+            "390x844",
+            "320x568"
+          ],
+          "generationCreditsConsumed": 0,
+          "method": "Direct refinement of the existing public draft; no private project source uploaded.",
+          "verification": "Browser reviewed desktop and mobile appearance, 44px prompt targets, no navigation, working tech/background/contact suggestions, preserved typed draft, disabled controls while pending, focus on minimize for suggestion submissions, hiding and restoring suggestions, direct LinkedIn/GitHub links without duplicate IDs, compact horizontal scrolling and no page overflow. Independent source review resolved default submit-button ordering and visible-viewport sizing. Inline JavaScript syntax and unchanged public assets checked. Saved HTML matches the reviewed preview.",
+          "limitations": "Native Enter submission is source-verified through form-associated button ordering; browser keyboard simulation did not trigger implicit submission. Actual mobile keyboard behavior needs real-device verification. Replies remain local examples in this design preview.",
+          "content": "Original hidden information-panel markup is retained as profile content and the source of verified contact links; no navigation opens it.",
+          "implementation": "Design-only. Frontend and backend unchanged."
+        },
+        "wholeBubbleFade": {
+          "version": 16,
+          "generationCreditsConsumed": 0,
+          "method": "Local refinement of the existing public draft; no private repository source uploaded. The initially proposed edge-mask draft was not published and was replaced following user clarification.",
+          "verification": {
+            "desktop": "At 1440x900, real message bubbles use fixed painting without a mask. A partially faded earlier reply remained a complete rounded card above the transcript boundary (top 185px versus transcript top 307px), with uniform opacity 0.285531. Latest visible replies remained fully opaque.",
+            "history": "Native wheel scrolling over a fixed reply moved the transcript from 172px to 82px; minimizing and reopening preserved 82px and all four messages.",
+            "longMessage": "A 1400-character message kept an intact 318px outer bubble. Its 302px inner reading area contained 630px of text and scrolled independently by 200px; bringing the card into view made it fully opaque.",
+            "compactLayouts": "At 390x844 and 768x1024, messages returned to relative positioning and content wrappers used display:contents; spacer hidden, no mask, no horizontal page overflow. Existing mobile/tablet transcript scrolling retained.",
+            "controls": "Final desktop screenshot verified caption/minimize controls clear the fading cards: header right edge 533px, transcript left edge 549px. The header retains its original 44px layout height, preserving conversation geometry.",
+            "contentAndScope": "Visible scroll hint removed everywhere. Public assets, identity, profile facts, example prompts, contact URLs, composer and desktop left/right alignment retained. Changes remain in the public design preview only.",
+            "review": "Independent helper review and inline JavaScript syntax checks completed. Keyboard focus handling is source-reviewed; real-device keyboard behavior remains unverified."
+          },
+          "limitations": "Real-device mobile keyboard behavior remains unverified. Responses in this design preview are local examples, not production API replies.",
+          "implementation": "Design-only. Frontend and backend unchanged."
+        },
+        "pairSpacingAndFade": {
+          "version": 17,
+          "generationCreditsConsumed": 0,
+          "method": "Direct refinement of the existing public preview. No private project source uploaded.",
+          "verification": {
+            "desktop": {
+              "viewport": "1440x900",
+              "withinPairGapPx": 12,
+              "betweenPairGapPx": 32,
+              "threeExchanges": "Observed six whole message cards. Newest prompt/reply opacity 1; preceding pair opacity 0.78197; oldest reply opacity 0.104674. Whole cards fade without a viewport gradient mask or clipped rounded edges.",
+              "historyScroll": "Native wheel scrolling moved scrollTop from 77 to 0. Oldest prompt/reply opacity increased to 0.914206; the middle pair reached 0.992171; the newest exchange faded below the reading area.",
+              "latestReply": "Clicking Latest reply returned scrollTop to 77 (453px content, 376px viewport) and restored opacity 1 for the newest prompt and response.",
+              "visualReview": "Desktop screenshot inspected; larger exchange spacing and progressively fainter older bubbles visible."
+            },
+            "mobile": {
+              "viewport": "390x844",
+              "mode": "docked",
+              "messagePosition": "relative",
+              "allMessageOpacities": 1,
+              "withinPairGapPx": 12,
+              "betweenPairGapPx": 32,
+              "spacerDisplay": "none",
+              "horizontalOverflow": false,
+              "visualReview": "Mobile screenshot inspected. Conversation retains ordinary scrolling without desktop fading."
+            },
+            "tablet": {
+              "viewport": "768x1024",
+              "mode": "docked",
+              "messagePosition": "relative",
+              "allMessageOpacities": 1,
+              "withinPairGapPx": 12,
+              "betweenPairGapPx": 32,
+              "spacerDisplay": "none",
+              "horizontalOverflow": false
+            },
+            "sourceChecks": {
+              "javascriptSyntax": "node --check passed for pair-bubble-fade.js",
+              "independentReview": "No double-counted spacing or fade regression found. Desktop pair spacing is counted once in logical offsets; docked spacing combines 12px gap with 20px margin. Existing reduced-motion override covers the new desktop opacity transition."
+            },
+            "scope": "Public design preview only. No application source changes, private source upload, or actual backend API test."
+          },
+          "implementation": "Design-only. Frontend and backend unchanged."
         }
       },
       "implementation": {
-        "draftVersion": 9,
+        "draftVersion": 17,
         "source": "frontend/app/pages/index.vue",
         "overlay": "frontend/app/components/QuietDeskOverlay.vue",
-        "chat": "Streams from POST /api/v1/lucasai/stream via the existing backend proxy.",
-        "mobile": "Preserves frontend edge-to-edge 100lvh image and clock safe-area offsets. Sheets follow VisualViewport for the keyboard. Compact landscape avoids clock overlap.",
-        "verification": "89 existing tests and production build passed; composer focus appearance verified in the browser.",
+        "layout": "frontend/app/utils/quietDeskLayout.ts",
+        "chat": "Streams from POST /api/v1/lucasai/stream via the existing Nuxt backend proxy. Latest-user-only request contract, stream pacing, safe Markdown, error handling and abort cleanup retained. No backend or heartbeat changes.",
+        "features": "Bottom Ask me anything composer, no About/Contact navigation or chat modal, three prompt suggestions, verified contact links, preserved typed drafts and in-memory conversation history, minimize/reopen, latest-reply navigation, desktop left prompts/right replies and Thinking, 12px within exchanges and 32px between them, progressive whole-bubble fading on desktop only.",
+        "mobile": "Docked scrollable conversation and expanded reading mode; VisualViewport/safe-area layout retained. Existing edge-to-edge 100lvh photograph and Brussels clock unchanged.",
+        "streamingRefinement": "Long desktop reply bodies follow incoming text only while their reader and the outer transcript follow the latest reply. Scrolling either level pauses following. Latest reply returns both scroll levels to their newest text.",
+        "verification": {
+          "automated": "87 tests passed across 17 files; final typecheck and production build passed; git diff --check passed.",
+          "testEnvironment": "Added jsdom 30.0.1 as an exact dev dependency for the two Markdown-related test files. Production sanitizer unchanged. DOMPurify documents happy-dom as unsupported.",
+          "browserViewports": [
+            "1440x900",
+            "768x1024",
+            "390x844",
+            "320x568",
+            "812x375"
+          ],
+          "desktop": "Native browser review confirmed 12px within pairs and approximately 32px between pairs, progressively fainter older whole bubbles, fully opaque latest pair, correct left/right positioning and unchanged composer outline/shadow.",
+          "history": "Native wheel moved desktop history to 27px; minimize/reopen preserved 27px and all six messages. During another streamed response, scrollTop remained 509px as the reply grew from 1427 to 1989 characters.",
+          "longReply": "A 318px intact bubble held a 284px body with 1614px content. Body followed to 1329.5px; native upward scrolling reached 979.5px and revealed Latest reply. Latest restored 1329.5px.",
+          "responsive": "Phone and tablet messages stayed relative and fully opaque with no horizontal page overflow. Mobile expand/collapse, short viewport reading mode, horizontally scrolling suggestions, and a 16px composer input verified.",
+          "interactions": "Suggestions sent through the actual frontend proxy to a local Spring-compatible SSE fixture, retained a typed draft and focused minimize. Contact links, HTTP 503 error display and subsequent recovery verified.",
+          "limitations": "Browser API checks used a local SSE fixture, not a live AI model. Physical mobile keyboard and touch behavior require real-device verification."
+        },
         "deployed": false
       }
     }

@@ -4,9 +4,9 @@ import QuietDeskOverlay from '~/components/QuietDeskOverlay.vue'
 
 useSeoMeta({
   title: 'Lucas van der Kleij — Software Engineer',
-  description: 'Software engineer focused on backend systems and architecture, with frontend experience and a growing interest in AI.',
+  description: 'Software Engineer with 4+ years of experience building software solutions in financial services. Java, Kotlin, Spring Boot, Angular, Nuxt, and Azure.',
   ogTitle: 'Lucas van der Kleij — Software Engineer',
-  ogDescription: 'Backend-focused software engineer with experience in architecture, frontend development, and a growing interest in AI.',
+  ogDescription: 'Software Engineer with 4+ years of experience across architecture, development, cloud infrastructure, CI/CD, security, testing, and observability.',
   ogType: 'website',
   ogImage: 'https://lucasvanderkleij.dev/images/lucas-desk-scene.png',
   ogImageAlt: 'Lucas van der Kleij working at a wooden desk in a warm, minimal studio.'

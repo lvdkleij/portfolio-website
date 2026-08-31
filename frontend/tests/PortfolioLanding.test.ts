@@ -37,27 +37,32 @@ describe('portfolio landing page', () => {
     expect(existsSync(resolve(process.cwd(), 'public/images/lucas-desk-scene.png'))).toBe(true)
   })
 
-  it('renders the approved identity, compact menu and inline AI chat entry', async () => {
+  it('renders the identity, bottom composer and example questions without a menu or chat modal', async () => {
     const wrapper = mount(PortfolioLanding)
     await nextTick()
 
     expect(wrapper.text()).toContain('BRUSSELS')
     expect(wrapper.get('h1').text()).toBe('Lucas van der Kleij')
     expect(wrapper.get('.quiet-identity p').text()).toBe('Software engineer')
-    expect(wrapper.get('nav').text()).toContain('About')
-    expect(wrapper.get('nav').text()).not.toContain('Approach')
-    expect(wrapper.get('nav').text()).toContain('Contact')
-    expect(wrapper.get('.quiet-chat-trigger').text()).toBe('AI Chat')
-    expect(wrapper.find('[role="dialog"], .portfolio-assistant, video, canvas').exists()).toBe(false)
+    expect(wrapper.get('#chat-input').attributes('placeholder')).toBe('Ask me anything…')
+    expect(wrapper.findAll('.prompt-chip').map(button => button.text())).toEqual([
+      'What do you work with?',
+      "What's your background?",
+      'How can I reach you?',
+    ])
+    expect(wrapper.find('nav, [role="dialog"], .portfolio-assistant, video, canvas').exists()).toBe(false)
+    expect(wrapper.get('#conversation').attributes('hidden')).toBeDefined()
   })
 
-  it('prerenders the original image without requiring JavaScript', async () => {
+  it('prerenders the original image and chat entry without requiring JavaScript', async () => {
     const html = await renderToString(createSSRApp(PortfolioLanding))
 
     expect(html).toContain('src="/images/lucas-desk-scene.png"')
     expect(html).toContain('alt="Lucas van der Kleij working on a laptop')
     expect(html).toContain('<h1')
     expect(html).toContain('Software engineer')
+    expect(html).toContain('placeholder="Ask me anything…"')
+    expect(html).not.toContain('<nav')
     expect(html).not.toContain('<video')
   })
 
