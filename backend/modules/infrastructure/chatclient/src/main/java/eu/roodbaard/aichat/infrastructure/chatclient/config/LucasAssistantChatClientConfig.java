@@ -12,6 +12,8 @@ public class LucasAssistantChatClientConfig {
     public ChatClient lucasAssistantChatClient(OpenAiChatModel openAiChatModel) {
         ChatClient.Builder builder = ChatClient.builder(openAiChatModel);
 
+        builder.defaultSystem(systemPromptTemplate);
+        
         return builder.build();
     }
 }
