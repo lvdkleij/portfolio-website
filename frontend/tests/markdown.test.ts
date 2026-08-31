@@ -1,7 +1,15 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 import { renderSafeMarkdown } from '~/utils/markdown'
 
 describe('Markdown rendering', () => {
+  it('preserves a heading at the beginning of a reply', () => {
+    const rendered = renderSafeMarkdown('## Experience\n\n**Spring Boot** microservices.')
+
+    expect(rendered).toMatch(/^<h2>Experience<\/h2>/)
+    expect(rendered).toContain('<p><strong>Spring Boot</strong> microservices.</p>')
+  })
+
   it('renders the response structures supported by the chat UI', () => {
     const rendered = renderSafeMarkdown([
       'Introductory paragraph.',
