@@ -170,7 +170,7 @@ function submitChat() {
       </header>
 
       <nav class="quiet-menu" aria-label="Profile menu">
-        <button v-for="name in (['about', 'approach', 'contact'] as const)" :key="name" class="quiet-text-action" type="button" aria-haspopup="dialog" aria-controls="quiet-panel" @click="openFromMenu(name, $event)">{{ panelNames[name] }}</button>
+        <button v-for="name in (['about', 'contact'] as const)" :key="name" class="quiet-text-action" type="button" aria-haspopup="dialog" aria-controls="quiet-panel" @click="openFromMenu(name, $event)">{{ panelNames[name] }}</button>
       </nav>
 
       <div class="quiet-chat-entry">
@@ -211,7 +211,10 @@ function submitChat() {
       </template>
 
       <div v-else class="quiet-info-content">
-        <p v-if="activePanel === 'about'">Lucas is a software engineer working mainly with backend systems and architecture, with some frontend experience and a growing interest in AI.</p>
+        <template v-if="activePanel === 'about'">
+          <p>I'm a Software Engineer with 4+ years of experience building software solutions in the financial services sector.</p>
+          <p>My experience covers the full delivery lifecycle, from architecture and development to cloud infrastructure, CI/CD, security, testing, and observability. I am specialised in building Spring Boot microservices with Java and Kotlin, modern web applications with Angular and Nuxt, and event-driven, serverless solutions in Azure.</p>
+        </template>
         <p v-else-if="activePanel === 'approach'">Understand the context first, shape clear systems around the real constraints, then iterate carefully toward a useful result.</p>
         <template v-else>
           <p>Find Lucas on LinkedIn and GitHub.</p>
@@ -267,6 +270,7 @@ function submitChat() {
 .quiet-icon-button svg { width: 19px; height: 19px; color: var(--quiet-muted); }
 .quiet-info-content { min-height: 0; padding: 24px; overflow-y: auto; font-size: 15px; line-height: 1.65; }
 .quiet-info-content p { margin: 0; }
+.quiet-info-content p + p { margin-top: 16px; }
 .quiet-contact-links { display: flex; flex-direction: column; gap: 4px; margin-top: 20px; }
 .quiet-contact-links a { display: inline-flex; align-items: center; justify-content: space-between; min-height: 44px; border-bottom: 1px solid rgb(185 170 152 / 68%); font-size: 15px; }
 .quiet-contact-links a:hover { color: var(--quiet-focus); }

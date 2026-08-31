@@ -45,7 +45,7 @@ describe('portfolio landing page', () => {
     expect(wrapper.get('h1').text()).toBe('Lucas van der Kleij')
     expect(wrapper.get('.quiet-identity p').text()).toBe('Software engineer')
     expect(wrapper.get('nav').text()).toContain('About')
-    expect(wrapper.get('nav').text()).toContain('Approach')
+    expect(wrapper.get('nav').text()).not.toContain('Approach')
     expect(wrapper.get('nav').text()).toContain('Contact')
     expect(wrapper.get('.quiet-chat-trigger').text()).toBe('AI Chat')
     expect(wrapper.find('[role="dialog"], .portfolio-assistant, video, canvas').exists()).toBe(false)

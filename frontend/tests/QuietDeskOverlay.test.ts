@@ -50,7 +50,7 @@ describe('quiet desk menu and chat', () => {
   it('starts with the approved minimal menu and no transcript or floating launcher', () => {
     const wrapper = mount(QuietDeskOverlay)
     expect(wrapper.get('h1').text()).toBe('Lucas van der Kleij')
-    expect(wrapper.findAll('nav button').map(button => button.text())).toEqual(['About', 'Approach', 'Contact'])
+    expect(wrapper.findAll('nav button').map(button => button.text())).toEqual(['About', 'Contact'])
     expect(wrapper.get('.quiet-chat-trigger').text()).toBe('AI Chat')
     expect(wrapper.get('#quiet-resting-input').attributes('placeholder')).toBe('Ask me something…')
     expect(wrapper.find('[role="dialog"], [role="log"], .portfolio-assistant').exists()).toBe(false)
@@ -58,9 +58,8 @@ describe('quiet desk menu and chat', () => {
   })
 
   it.each([
-    [0, 'About', 'working mainly with backend systems and architecture'],
-    [1, 'Approach', 'Understand the context first'],
-    [2, 'Contact', 'Find Lucas on LinkedIn and GitHub']
+    [0, 'About', '4+ years of experience building software solutions in the financial services sector.'],
+    [1, 'Contact', 'Find Lucas on LinkedIn and GitHub']
   ] as const)('opens menu item %s with accurate content and returns focus', async (index, title, text) => {
     const wrapper = mount(QuietDeskOverlay, { attachTo: document.body })
     const trigger = wrapper.findAll('nav button')[index]!
@@ -78,7 +77,7 @@ describe('quiet desk menu and chat', () => {
 
   it('offers the real contact links without requiring chat', async () => {
     const wrapper = mount(QuietDeskOverlay)
-    await wrapper.findAll('nav button')[2]!.trigger('click')
+    await wrapper.findAll('nav button')[1]!.trigger('click')
     expect(wrapper.findAll('a').map(link => link.attributes('href'))).toEqual([
       'https://www.linkedin.com/in/lucas-van-der-kleij', 'https://github.com/lvdkleij'
     ])
