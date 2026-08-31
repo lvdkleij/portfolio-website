@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/api/lucasai")
+@RequestMapping("/api/v1/lucasai")
 public class LucasAssistantChatController {
 
     private final ChatClientService chatClientService;
 
-    public LucasAssistantChatController(@Qualifier("lucasAssistantChatClient") ChatClientService chatClientService) {
+    public LucasAssistantChatController(@Qualifier("lucasAssistantChatClientService") ChatClientService chatClientService) {
         this.chatClientService = chatClientService;
     }
 
-    @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> stream(@RequestParam("message") String message) {
         return chatClientService.stream(message);
     }

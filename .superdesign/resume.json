@@ -8,20 +8,27 @@
       "activeDraftId": "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f",
       "designSystemPath": ".superdesign/design-system.md",
       "referenceIds": [
-        "fb99df05-8dfa-473c-9cc0-0b97282dc33c"
+        "fb99df05-8dfa-473c-9cc0-0b97282dc33c",
+        "8344187f-a10d-4f85-98fa-274a23323938"
       ],
       "contextFiles": [
         ".superdesign/design-system.md",
         "frontend/app/pages/index.vue",
         "frontend/app/app.vue",
         "frontend/app/assets/css/main.css:1:88",
-        "frontend/app/assets/css/main.css:1508:1516"
+        "frontend/app/assets/css/main.css:1508:1516",
+        "frontend/app/components/QuietDeskOverlay.vue",
+        "frontend/app/components/QuietDeskIcon.vue",
+        "frontend/app/utils/quietDeskChat.ts"
       ],
       "fingerprints": {
-        ".superdesign/design-system.md": "d56ae8656995d89f64cb8385a7aa4ce4ba32a208bd8e6ae98e942fcda6d20fc7",
-        "frontend/app/pages/index.vue": "ef2d7e681a84b481f8f10a28cf41c9549f7d2b1e43950d45ff4650b52e1cd06a",
+        ".superdesign/design-system.md": "ed3e5d03d97f080ef911684d4170579a3d9884dd185416784fc743943aa60f7d",
+        "frontend/app/pages/index.vue": "aa5f1d4847123170a4d8248f7e7e3eeffb487dc2d9f860f7e79c04f7975e1df7",
         "frontend/app/app.vue": "c3ea2b5873779fc5d429c49fa2776e1c2f80723883c1a5c649eab7247806a479",
-        "frontend/app/assets/css/main.css": "4c88905f0bdf211434cb6bde8258c7dd886f960e902970dc668882c7b2c9b0c0"
+        "frontend/app/assets/css/main.css": "4c88905f0bdf211434cb6bde8258c7dd886f960e902970dc668882c7b2c9b0c0",
+        "frontend/app/components/QuietDeskOverlay.vue": "d558085a2d8a6dd4f62dde0fe98deb65b5186c25ea6f6eaa63847c3733db928f",
+        "frontend/app/components/QuietDeskIcon.vue": "6de5c960e192fcdd82aa71ca41b1db4b8c9b797ba9817801e2f5834055d298dc",
+        "frontend/app/utils/quietDeskChat.ts": "370e88714431fa770a56e85b77757c983705c709e5179db742c6541c27caf1f1"
       },
       "components": [],
       "contentAssets": {
@@ -32,12 +39,12 @@
       },
       "drafts": {
         "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f": {
-          "title": "Lucas — Quiet desk with minimal menu and AI chat",
-          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high).",
-          "currentVersion": 5
+          "title": "Lucas — Refined quiet-desk typography",
+          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high). v6=approved upright Newsreader 400 name with quieter Inter role/menu/chat, mobile input 16px and otherwise unchanged composition. v7=minimum 44px menu touch target correction.",
+          "currentVersion": 7
         }
       },
-      "updatedAt": "2026-08-30T13:17:51.147Z",
+      "updatedAt": "2026-08-31T06:49:11.095Z",
       "baselineVersion": 1,
       "review": {
         "desktop": "1440x900",
@@ -47,7 +54,25 @@
         ],
         "noApplicationChanges": true,
         "chat": "Local mocked text conversation with optional capability overview; no AI integration.",
-        "generationCreditsConsumed": 64.5
+        "generationCreditsConsumed": 76,
+        "typography": {
+          "fonts": "Newsreader 400 identity; Inter interface; existing monospace clock",
+          "fontLoading": "Verified in browser",
+          "overflow": "No document overflow at reviewed sizes",
+          "touchTargets": "Verified 44px minimum after correction",
+          "chatFocus": "Opens on composer and restores focus to AI Chat on close",
+          "sourcePreservation": "Body markup and scripts identical to v5; exact photograph and clock retained",
+          "version": 7
+        }
+      },
+      "implementation": {
+        "draftVersion": 7,
+        "source": "frontend/app/pages/index.vue",
+        "overlay": "frontend/app/components/QuietDeskOverlay.vue",
+        "chat": "Local and ephemeral; scripted replies only; no backend/model calls",
+        "mobile": "Preserves frontend edge-to-edge 100lvh image and clock safe-area offsets. Sheets follow VisualViewport for the keyboard. Compact landscape avoids clock overlap.",
+        "verification": "87 tests, typecheck and production build passed; desktop and mobile browser review",
+        "deployed": false
       }
     }
   }
