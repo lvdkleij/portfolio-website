@@ -13,6 +13,7 @@ interface Message {
 
 const panelNames = { about: 'About', approach: 'Approach', contact: 'Contact', chat: 'AI assistant' } as const
 const activePanel = ref<Panel | null>(null)
+const entering = ref(true)
 const panelTitle = computed(() => activePanel.value ? panelNames[activePanel.value] : '')
 const restingDraft = ref('')
 const chatDraft = ref('')
@@ -47,7 +48,12 @@ function updateViewport() {
   }
 }
 
+function finishEntrance() {
+  entering.value = false
+}
+
 onMounted(() => {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) finishEntrance()
   // Keep the photo full-height, but size open sheets to the visible keyboard-safe area.
   visualViewport = window.visualViewport
   visualViewport?.addEventListener('resize', updateViewport)
@@ -68,6 +74,7 @@ async function scrollToLatest() {
 }
 
 async function openPanel(name: Panel, trigger: HTMLElement | null) {
+  finishEntrance()
   returnFocus = trigger
   activePanel.value = name
   if (name === 'chat' && messages.value.length === 0) {
@@ -162,7 +169,7 @@ function submitChat() {
 </script>
 
 <template>
-  <div class="quiet-ui" :style="viewportStyle">
+  <div class="quiet-ui" :class="{ 'quiet-ui--entering': entering }" :style="viewportStyle" @focusin="finishEntrance">
     <section v-show="!activePanel" class="quiet-stack" aria-label="Introduction and menu">
       <header class="quiet-identity">
         <h1>Lucas van der Kleij</h1>
@@ -173,7 +180,7 @@ function submitChat() {
         <button v-for="name in (['about', 'contact'] as const)" :key="name" class="quiet-text-action" type="button" aria-haspopup="dialog" aria-controls="quiet-panel" @click="openFromMenu(name, $event)">{{ panelNames[name] }}</button>
       </nav>
 
-      <div class="quiet-chat-entry">
+      <div class="quiet-chat-entry" @animationend.self="finishEntrance" @animationcancel.self="finishEntrance">
         <button ref="chatTrigger" class="quiet-chat-trigger" type="button" aria-haspopup="dialog" aria-controls="quiet-panel" @click="openPanel('chat', chatTrigger)">
           <QuietDeskIcon name="message" />
           <span>AI Chat</span>
@@ -243,7 +250,7 @@ function submitChat() {
   pointer-events: none;
 }
 .quiet-ui button, .quiet-ui input { color: inherit; font: inherit; }
-.quiet-ui button:focus-visible, .quiet-ui a:focus-visible, .quiet-ui input:focus-visible { outline: 2px solid var(--quiet-focus); outline-offset: 3px; }
+.quiet-ui button:focus-visible, .quiet-ui a:focus-visible { outline: 2px solid var(--quiet-focus); outline-offset: 3px; }
 .quiet-ui svg { display: block; width: 18px; height: 18px; flex: 0 0 auto; }
 .quiet-stack { position: absolute; top: clamp(56px, 13vh, 112px); left: clamp(24px, 6vw, 96px); width: min(340px, calc(100% - 48px)); pointer-events: auto; }
 .quiet-identity h1 { margin: 0; font-family: Newsreader, serif; font-size: clamp(40px, 2.75vw, 44px); font-weight: 400; font-style: normal; font-optical-sizing: auto; line-height: 1.08; letter-spacing: -0.025em; }
@@ -257,7 +264,6 @@ function submitChat() {
 .quiet-composer { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 12px; padding: 4px 4px 4px 16px; border: 1px solid rgb(185 170 152 / 90%); border-radius: 18px; background: rgb(241 234 222 / 72%); }
 .quiet-composer input { width: 0; min-width: 0; flex: 1; border: 0; border-radius: 0; padding: 1px 2px; outline: 0; background: transparent; font-size: 14px; }
 .quiet-composer input::placeholder { color: var(--quiet-muted); opacity: 1; }
-.quiet-composer:focus-within { outline: 2px solid var(--quiet-focus); outline-offset: 3px; }
 .quiet-send-button { display: inline-grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; padding: 0; border: 0; border-radius: 14px; background: transparent; }
 .quiet-send-button:hover:not(:disabled) { background: rgb(232 230 225 / 72%); }
 .quiet-send-button:disabled { opacity: 0.45; cursor: default; }
@@ -284,6 +290,24 @@ function submitChat() {
 .quiet-thinking { color: var(--quiet-muted); }
 .quiet-chat-footer { flex: 0 0 auto; padding: 12px; border-top: 1px solid rgb(185 170 152 / 68%); background: var(--quiet-panel); }
 .quiet-chat-footer .quiet-composer { margin-top: 0; background: var(--quiet-paper); }
+
+@keyframes quiet-arrive {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .quiet-ui--entering .quiet-identity h1,
+  .quiet-ui--entering .quiet-identity p,
+  .quiet-ui--entering .quiet-menu .quiet-text-action,
+  .quiet-ui--entering .quiet-chat-entry {
+    animation: quiet-arrive 640ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  .quiet-ui--entering .quiet-identity p { animation-delay: 100ms; }
+  .quiet-ui--entering .quiet-menu .quiet-text-action { animation-delay: 200ms; }
+  .quiet-ui--entering .quiet-menu .quiet-text-action:nth-child(2) { animation-delay: 280ms; }
+  .quiet-ui--entering .quiet-chat-entry { animation-delay: 360ms; }
+}
 
 @media (max-width: 639px) {
   .quiet-ui { inset: 0; }

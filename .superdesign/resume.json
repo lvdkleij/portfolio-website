@@ -26,7 +26,7 @@
         "frontend/app/pages/index.vue": "aa5f1d4847123170a4d8248f7e7e3eeffb487dc2d9f860f7e79c04f7975e1df7",
         "frontend/app/app.vue": "c3ea2b5873779fc5d429c49fa2776e1c2f80723883c1a5c649eab7247806a479",
         "frontend/app/assets/css/main.css": "4c88905f0bdf211434cb6bde8258c7dd886f960e902970dc668882c7b2c9b0c0",
-        "frontend/app/components/QuietDeskOverlay.vue": "d558085a2d8a6dd4f62dde0fe98deb65b5186c25ea6f6eaa63847c3733db928f",
+        "frontend/app/components/QuietDeskOverlay.vue": "87fbbc5193742366af14d2729615aeb55072be598b475b8df1842714096dd48b",
         "frontend/app/components/QuietDeskIcon.vue": "6de5c960e192fcdd82aa71ca41b1db4b8c9b797ba9817801e2f5834055d298dc",
         "frontend/app/utils/quietDeskChat.ts": "370e88714431fa770a56e85b77757c983705c709e5179db742c6541c27caf1f1"
       },
@@ -40,11 +40,11 @@
       "drafts": {
         "8ffe89d2-c521-4b3b-b6a6-bc42944c4e9f": {
           "title": "Lucas — Refined quiet-desk typography",
-          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high). v6=approved upright Newsreader 400 name with quieter Inter role/menu/chat, mobile input 16px and otherwise unchanged composition. v7=minimum 44px menu touch target correction.",
-          "currentVersion": 7
+          "visualDirection": "Minimal Inter menu and compact AI composer over unchanged approved desk photograph. v1=image-only baseline, v2=GPT-5.6 Sol proposal, v3=mobile/focus corrections, v4=top-centred Brussels local-time badge with requested black/monospace/green treatment and mobile spacing adjustments. v5 reduces only the Brussels badge (desktop32px high; mobile24px high). v6=approved upright Newsreader 400 name with quieter Inter role/menu/chat, mobile input 16px and otherwise unchanged composition. v7=minimum 44px menu touch target correction. v8=one-second staggered entrance for name, role, About, Contact, and chat, with 8px upward movement, reduced-motion support and immediate completion on focus/open; About copy synchronized and Approach hidden. v9=removed composer focus-within highlight and input focus-visible outline; autofocus, typing, and focus indicators for other controls retained.",
+          "currentVersion": 9
         }
       },
-      "updatedAt": "2026-08-31T06:49:11.095Z",
+      "updatedAt": "2026-08-31T08:03:20.594234+00:00",
       "baselineVersion": 1,
       "review": {
         "desktop": "1440x900",
@@ -52,8 +52,8 @@
           "390x844",
           "320x568"
         ],
-        "noApplicationChanges": true,
-        "chat": "Local mocked text conversation with optional capability overview; no AI integration.",
+        "noApplicationChanges": false,
+        "chat": "Design preview uses local example replies; the implemented frontend calls POST /api/v1/lucasai/stream.",
         "generationCreditsConsumed": 76,
         "typography": {
           "fonts": "Newsreader 400 identity; Inter interface; existing monospace clock",
@@ -63,15 +63,32 @@
           "chatFocus": "Opens on composer and restores focus to AI Chat on close",
           "sourcePreservation": "Body markup and scripts identical to v5; exact photograph and clock retained",
           "version": 7
+        },
+        "motion": {
+          "version": 8,
+          "durationMs": 1000,
+          "movementPx": 8,
+          "staggerMs": [
+            0,
+            100,
+            200,
+            280,
+            360
+          ],
+          "verification": "Browser confirmed stagger timing, stationary photograph, immediate completion on keyboard focus, no replay after closing a panel, and no overflow at 390x844. Reduced motion is disabled by CSS and checked on mount."
+        },
+        "composerFocus": {
+          "version": 9,
+          "verification": "Browser verified focused chat input and composer have outline-style none and box-shadow none, with INPUT still active."
         }
       },
       "implementation": {
-        "draftVersion": 7,
+        "draftVersion": 9,
         "source": "frontend/app/pages/index.vue",
         "overlay": "frontend/app/components/QuietDeskOverlay.vue",
-        "chat": "Local and ephemeral; scripted replies only; no backend/model calls",
+        "chat": "Streams from POST /api/v1/lucasai/stream via the existing backend proxy.",
         "mobile": "Preserves frontend edge-to-edge 100lvh image and clock safe-area offsets. Sheets follow VisualViewport for the keyboard. Compact landscape avoids clock overlap.",
-        "verification": "87 tests, typecheck and production build passed; desktop and mobile browser review",
+        "verification": "89 existing tests and production build passed; composer focus appearance verified in the browser.",
         "deployed": false
       }
     }
