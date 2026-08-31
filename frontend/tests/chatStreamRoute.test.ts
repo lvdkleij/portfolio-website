@@ -14,6 +14,7 @@ type TestEvent = {
 
 const originalBackendBaseUrl = process.env.BACKEND_BASE_URL
 const encoder = new TextEncoder()
+let backendEndpoint = '/api/chat/stream'
 
 const request: ChatRequest = {
   clientRequestId: 'request-1',
@@ -65,7 +66,9 @@ async function loadHandler(options: {
     }
   }))
 
-  const module = await import('../server/api/chat/stream.post')
+  const module = backendEndpoint === '/api/v1/lucasai/stream'
+    ? await import('../server/api/v1/lucasai/stream.post')
+    : await import('../server/api/chat/stream.post')
   return {
     handler: module.default as unknown as ChatStreamHandler,
     fetcher,
@@ -84,7 +87,8 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('chat stream server route', () => {
+describe.each(['/api/chat/stream', '/api/v1/lucasai/stream'])('chat stream server route %s', (endpoint) => {
+  beforeEach(() => { backendEndpoint = endpoint })
   it('streams the latest user message from the private backend', async () => {
     const source = encoder.encode('data:Hello 👋\n\ndata:café\n\n')
     const fetcher = vi.fn(async () => springSseResponse(Array.from(source, byte => Uint8Array.of(byte))))
@@ -95,7 +99,7 @@ describe('chat stream server route', () => {
 
     expect(fetcher).toHaveBeenCalledTimes(1)
     const [url, init] = fetcher.mock.calls[0]!
-    expect(String(url)).toBe('http://backend.internal/api/chat/stream?message=Latest+question')
+    expect(String(url)).toBe(`http://backend.internal${endpoint}?message=Latest+question`)
     expect(init).toMatchObject({
       method: 'POST',
       headers: { Accept: 'text/event-stream' }

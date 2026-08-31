@@ -18,6 +18,4 @@ public class OpenAiChatClientService implements ChatClientService {
     public Flux<String> stream(String message) {
         return this.chatClient.prompt().user(message).stream().content();
     }
-
-
 }

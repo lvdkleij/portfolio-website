@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import QuietDeskOverlay from '~/components/QuietDeskOverlay.vue'
 
 useSeoMeta({
   title: 'Lucas van der Kleij — Software Engineer',
@@ -14,15 +15,15 @@ useSeoMeta({
 useHead({
   htmlAttrs: { class: 'desk-page' },
   bodyAttrs: { class: 'desk-page' },
-  link: [{ rel: 'canonical', href: 'https://lucasvanderkleij.dev/' }],
+  link: [
+    { rel: 'canonical', href: 'https://lucasvanderkleij.dev/' },
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400&display=swap' }
+  ],
   meta: [{ name: 'theme-color', content: '#e8e6e1' }]
 })
 
 const brusselsDisplay = ref('— —:—')
 const brusselsIso = ref('')
-const canPlayVideo = ref(false)
-const videoFailed = ref(false)
-let motionPreference: MediaQueryList | undefined
 let brusselsTimer: ReturnType<typeof setInterval> | undefined
 
 const brusselsFormatter = new Intl.DateTimeFormat('en-GB', {
@@ -40,23 +41,12 @@ function updateBrusselsTime() {
   brusselsIso.value = now.toISOString()
 }
 
-function updateMotionPreference() {
-  canPlayVideo.value = !motionPreference?.matches
-}
-
 onMounted(() => {
-  // Keep the still image for SSR/no-JavaScript and reduced-motion visitors.
-  if (typeof window.matchMedia === 'function') {
-    motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
-    motionPreference.addEventListener('change', updateMotionPreference)
-  }
-  updateMotionPreference()
   updateBrusselsTime()
   brusselsTimer = setInterval(updateBrusselsTime, 1000)
 })
 
 onBeforeUnmount(() => {
-  motionPreference?.removeEventListener('change', updateMotionPreference)
   if (brusselsTimer) clearInterval(brusselsTimer)
 })
 </script>
@@ -69,23 +59,7 @@ onBeforeUnmount(() => {
       <time :datetime="brusselsIso">{{ brusselsDisplay }}</time>
     </div>
     <div class="desk-landing__frame">
-      <video
-        v-if="canPlayVideo && !videoFailed"
-        class="desk-landing__video"
-        src="/videos/lucas-desk-scene.mp4"
-        poster="/images/lucas-desk-scene.png"
-        aria-label="Lucas van der Kleij working quietly on a laptop at a wooden desk in a warm beige studio."
-        width="1920"
-        height="1080"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        @error="videoFailed = true"
-      />
       <img
-        v-else
         class="desk-landing__image"
         src="/images/lucas-desk-scene.png"
         alt="Lucas van der Kleij working on a laptop at a wooden desk, with a lamp and coffee cup, in a warm beige studio."
@@ -96,6 +70,7 @@ onBeforeUnmount(() => {
         decoding="async"
       >
     </div>
+    <QuietDeskOverlay />
   </main>
 </template>
 
@@ -151,8 +126,7 @@ onBeforeUnmount(() => {
   background: #c5b09a;
 }
 
-.desk-landing__image,
-.desk-landing__video {
+.desk-landing__image {
   display: block;
   width: 100%;
   height: 100%;

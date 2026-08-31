@@ -1,6 +1,7 @@
 package eu.roodbaard.aichat.infrastructure.rest.controller;
 
 import eu.roodbaard.aichat.domain.service.ChatClientService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -11,7 +12,7 @@ public class ChatController {
 
     private final ChatClientService chatClientService;
 
-    public ChatController(ChatClientService chatClientService) {
+    public ChatController(@Qualifier("openAiChatClientService") ChatClientService chatClientService) {
         this.chatClientService = chatClientService;
 
     }
