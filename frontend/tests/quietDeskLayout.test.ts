@@ -191,6 +191,25 @@ afterEach(() => {
 })
 
 describe('desktop conversation scroll routing', () => {
+  it('completes a reopened follow only after the latest bubbles are repainted', () => {
+    const fixture = makeFixture()
+    const newestReply = fixture.replyBodies[2]!.parentElement!
+    newestReply.style.setProperty('--whole-bubble-y', '12px')
+    fixture.conversation.hidden = true
+    fixture.controller.collapse()
+    flushFrames()
+    fixture.conversation.hidden = false
+    let positionAtCompletion: string | undefined
+
+    fixture.controller.followLatest(() => {
+      positionAtCompletion = newestReply.style.getPropertyValue('--whole-bubble-y')
+    })
+
+    expect(positionAtCompletion).toBeUndefined()
+    flushFrames()
+    expect(Number.parseFloat(positionAtCompletion!)).toBeCloseTo(355, 0)
+  })
+
   it('anchors the newest reply beside the face after several exchanges', () => {
     const fixture = makeFixture()
     const newestReply = fixture.replyBodies[2]!.parentElement!

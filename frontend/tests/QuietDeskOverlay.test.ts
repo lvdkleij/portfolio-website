@@ -198,6 +198,37 @@ describe('quiet desk conversation', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
+  it('hides retained history until a reopened turn has been positioned', async () => {
+    const main = document.createElement('main');
+    main.innerHTML = '<img class="desk-landing__image" alt=""><div id="quiet-desk-test"></div>';
+    document.body.append(main);
+    const wrapper = mount(QuietDeskOverlay, {
+      attachTo: main.querySelector<HTMLElement>('#quiet-desk-test')!,
+    });
+
+    try {
+      await wrapper.get('#chat-input').setValue('First question');
+      await wrapper.get('#chat-form').trigger('submit');
+      await finishReply('First answer.');
+      await wrapper.get('#minimize-chat').trigger('click');
+      await wrapper.get('#chat-input').setValue('Second question');
+
+      const submission = wrapper.get('#chat-form').trigger('submit');
+      await nextTick();
+
+      expect(wrapper.get('#conversation').classes()).toContain('is-preparing-turn');
+      expect(wrapper.findAll('.chat-message')).toHaveLength(4);
+      await vi.advanceTimersByTimeAsync(40);
+      await nextTick();
+      await submission;
+      expect(wrapper.get('#conversation').classes()).not.toContain('is-preparing-turn');
+      await finishReply('Second answer.');
+    } finally {
+      wrapper.unmount();
+      main.remove();
+    }
+  });
+
   it('keeps all turns when minimized, sends only the latest user question, and does not persist the conversation', async () => {
     const storageSpy = vi.spyOn(Storage.prototype, 'setItem');
     const wrapper = mount(QuietDeskOverlay);

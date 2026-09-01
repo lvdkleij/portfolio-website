@@ -55,8 +55,8 @@ resource "azurerm_container_app" "ca_portfolio_backend_prod" {
       # 'image' is only used for initial creation of the container. 
       # Image updates happen in the backend-deploy.yml
       image  = "lakleij/portfolio-backend:latest"
-      cpu    = 0.5
-      memory = "1Gi"
+      cpu    = 0.25
+      memory = "0.5Gi"
     }
   }
 
