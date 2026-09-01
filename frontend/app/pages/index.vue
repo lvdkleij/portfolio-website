@@ -8,6 +8,7 @@ useSeoMeta({
   ogTitle: 'Lucas van der Kleij — Software Engineer',
   ogDescription: 'Software Engineer with 4+ years of experience across architecture, development, cloud infrastructure, CI/CD, security, testing, and observability.',
   ogType: 'website',
+  ogUrl: 'https://lucasvanderkleij.dev/',
   ogImage: 'https://lucasvanderkleij.dev/images/lucas-desk-scene.png',
   ogImageAlt: 'Lucas van der Kleij working at a wooden desk in a warm, minimal studio.'
 })
