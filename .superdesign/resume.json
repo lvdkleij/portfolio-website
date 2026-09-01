@@ -29,9 +29,9 @@
         "frontend/app/pages/index.vue": "f8d1670ec764d747c11a1a01656118dda97a2b449ad4ef3b69ab9fb22b619470",
         "frontend/app/app.vue": "c3ea2b5873779fc5d429c49fa2776e1c2f80723883c1a5c649eab7247806a479",
         "frontend/app/assets/css/main.css": "4c88905f0bdf211434cb6bde8258c7dd886f960e902970dc668882c7b2c9b0c0",
-        "frontend/app/components/QuietDeskOverlay.vue": "f02726797bd3332a737354fe1f4df8080a7140e035c94f37a09f90de7a57ae1a",
+        "frontend/app/components/QuietDeskOverlay.vue": "e17af56114683e19981bc45ecabb22a3a74957b7e5f60f097d81d2323f754289",
         "frontend/app/components/QuietDeskIcon.vue": "26bfa49628084d87d794fa3a17aa782b108008fc8ca85fc7ab984d2782bc2830",
-        "frontend/app/utils/quietDeskLayout.ts": "59110dfe71514716a6fc410f7f5d92e7aff618450e2390e1cabb5d4dee6394ab",
+        "frontend/app/utils/quietDeskLayout.ts": "59ed08aa75ce449726761a50fb7df2914a816b671bc24ededf5d1558c8fcdfde",
         "frontend/app/utils/markdown.ts": "9e0225eb2d20b17f47c45e60f6ef90be095cb383db857c9118c0f9b9a34b1fbd",
         "frontend/app/composables/useChatStream.ts": "8fa5cb97762052b23ceb2fd517bfa2ba039f1e27dfb80c321120e3c8012d9e3a"
       },
@@ -49,7 +49,7 @@
           "currentVersion": 17
         }
       },
-      "updatedAt": "2026-08-31T15:54:11.929744+00:00",
+      "updatedAt": "2026-09-01T10:48:58.754646+00:00",
       "baselineVersion": 1,
       "review": {
         "desktop": "1440x900",
@@ -222,6 +222,55 @@
             "scope": "Public design preview only. No application source changes, private source upload, or actual backend API test."
           },
           "implementation": "Design-only. Frontend and backend unchanged."
+        },
+        "desktopNestedScrollFix": {
+          "implementedAt": "2026-09-01T05:56:21.877646+00:00",
+          "scope": "Frontend implementation only; public design draft and backend unchanged.",
+          "behavior": "Desktop Latest reply no longer changes transcript height. Vertical wheel gestures consume available long-message movement first, forward the residual delta to conversation history, and retain that handoff during the gesture. Pointer focus uses preventScroll; keyboard focus remains revealable. Scroll positions are protected from layout and streaming races. Mobile/tablet remain native.",
+          "browserVerification": {
+            "viewport": "1440x900",
+            "stableBubble": "Inner reply moved 1329.5px to 1249.5px while transcript height stayed 376px, outer scroll stayed 2px, and body top stayed 372px.",
+            "boundaryHandoff": "One -1500px gesture moved inner reply 1249.5px to 0px and outer history 159px to 0px; the earlier implementation lost the residual outer movement.",
+            "pointerFocus": "Clicking a partially visible scrollable reply left outer scrollTop at 120px and card top at 254px.",
+            "latestControl": "Desktop Latest reply remained outside the message column at x=419.28..533px and did not resize the transcript."
+          },
+          "automatedVerification": "Focused suite: old utility failed 8 of 15 cases; fixed utility passed all 15. Full frontend suite passed 102 tests across 18 files. Typecheck, production build and git diff --check passed."
+        },
+        "mobileTabletFocusScrollFix": {
+          "implementedAt": "2026-09-01T07:30:46.485155+00:00",
+          "scope": "Frontend compact layouts only; desktop portrait design, public design draft, API contract, and backend unchanged.",
+          "behavior": "Composer pointer focus uses preventScroll and the document is locked to the single-screen experience below 1100px. Keyboard-sized VisualViewport changes keep the compact layout instead of forcing reading mode or hiding the identity. The conversation is bottom-anchored to the composer, prompt chips retain one row on phones, and Latest reply occupies the fixed-height header instead of changing transcript height.",
+          "browserVerification": {
+            "phone": "At 390x844, pointer focus kept scrollY at 0 and composer top at 774px. Resizing the focused viewport to 390x430 kept identity visible, suggestions at a stable 52px height, and reading mode off. A true short-screen reading view at 390x430 stayed open with identity hidden when the focused viewport reduced to 390x300.",
+            "tablet": "At 820x1180, pointer focus kept scrollY at 0 and composer top at 1100px. Resizing the focused viewport to 820x700 kept identity visible and reading mode off.",
+            "history": "At 390x844 with a long streamed reply, native scrolling moved scrollTop 1042px to 902px while conversation top stayed 462px and transcript clientHeight stayed 253px. Returning to bottom also kept clientHeight at 253px."
+          },
+          "automatedVerification": "Focused layout suite passed 19 tests. Full frontend suite passed 106 tests across 18 files; typecheck, production build, and git diff --check passed.",
+          "limitations": "Browser checks modelled keyboard occlusion by reducing the focused visual viewport. Physical iOS and Android keyboard animation still needs real-device verification."
+        },
+        "latestArrowControl": {
+          "implementedAt": "2026-09-01T07:35:58.888126+00:00",
+          "scope": "Frontend control styling and icon only; scrolling behavior, API contract, backend, and public design draft unchanged.",
+          "behavior": "Latest reply is now a subtle arrow-only circular button on desktop, tablet, and mobile. The visual control is 34px with a 15px down arrow and a transparent 44px effective pointer area. Its accessible name and transcript relationship remain available to assistive technology.",
+          "browserVerification": {
+            "mobile": "At 390x844, the arrow measured 34x34px in the compact header; transcript clientHeight remained 253px and document scrollY remained 0.",
+            "desktop": "At 1440x900, the arrow measured 34x34px at x=499..533px, clear of the transcript beginning at x=549px. Selecting it returned history to the latest reply, hid the control, and focused Minimize."
+          },
+          "automatedVerification": "Full frontend suite passed 106 tests across 18 files; typecheck and production build passed."
+        },
+        "desktopReplyFaceAnchor": {
+          "implementedAt": "2026-09-01T10:48:58.754646+00:00",
+          "scope": "Large-screen portrait frontend layout only; compact mobile/tablet layout, public design draft, API contract, and backend unchanged.",
+          "behavior": "Every newest assistant reply starts at the calibrated face position. The transparent portrait conversation keeps a stable height and adds native trailing history space, so older exchanges move upward while the current reply remains anchored during streaming. Manual history scrolling remains free; the down-arrow restores the exact face anchor.",
+          "browserVerification": {
+            "viewport": "1440x900",
+            "shortReplies": "Three consecutive short replies all began at y=355px. Before the fix they began at y=357px, 514px, and 594px.",
+            "streaming": "A long third reply stayed at y=355px at stream start, after reaching its 318px card limit, and after completion.",
+            "responsiveCrop": "Two consecutive replies aligned at y=310px for 1280x800 and y=429px for 1920x1080, matching the recalculated face coordinate minus 48px at both sizes.",
+            "history": "Scrolling upward moved the latest reply from y=355px to y=475px; the down-arrow restored y=355px and hid itself.",
+            "compactScope": "At 390x844, chat mode remained docked, messages remained relative, the portrait spacer stayed hidden, and document scrollY remained 0."
+          },
+          "automatedVerification": "Focused layout suite passed 20 tests. Full frontend suite passed 107 tests across 18 files; typecheck, production build, and git diff --check passed."
         }
       },
       "implementation": {
@@ -230,11 +279,11 @@
         "overlay": "frontend/app/components/QuietDeskOverlay.vue",
         "layout": "frontend/app/utils/quietDeskLayout.ts",
         "chat": "Streams from POST /api/v1/lucasai/stream via the existing Nuxt backend proxy. Latest-user-only request contract, stream pacing, safe Markdown, error handling and abort cleanup retained. No backend or heartbeat changes.",
-        "features": "Bottom Ask me anything composer, no About/Contact navigation or chat modal, three prompt suggestions, verified contact links, preserved typed drafts and in-memory conversation history, minimize/reopen, latest-reply navigation, desktop left prompts/right replies and Thinking, 12px within exchanges and 32px between them, progressive whole-bubble fading on desktop only.",
-        "mobile": "Docked scrollable conversation and expanded reading mode; VisualViewport/safe-area layout retained. Existing edge-to-edge 100lvh photograph and Brussels clock unchanged.",
-        "streamingRefinement": "Long desktop reply bodies follow incoming text only while their reader and the outer transcript follow the latest reply. Scrolling either level pauses following. Latest reply returns both scroll levels to their newest text.",
+        "features": "Bottom Ask me anything composer, no About/Contact navigation or chat modal, three prompt suggestions, verified contact links, preserved typed drafts and in-memory conversation history, minimize/reopen, subtle arrow-only latest navigation, desktop left prompts/right replies and Thinking, 12px within exchanges and 32px between them, progressive whole-bubble fading on desktop only.",
+        "mobile": "Docked touch-scrolling conversation bottom-anchored above the composer; keyboard-aware VisualViewport and safe-area layout prevents automatic reading-mode jumps. Phone suggestions keep one horizontal row, Latest reply stays in the stable panel header, and the compact document cannot pan behind the chat. Existing explicit/true-short-viewport reading mode remains.",
+        "streamingRefinement": "On large screens the newest reply is calibrated to the face and stays at that position throughout streaming; native trailing history space moves older exchanges upward without synthetic transforms. Long reply bodies and outer history retain coordinated scroll intent. Compact layouts keep native touch scrolling, a stable transcript viewport, and bottom-anchored streaming growth. Scrolling older content pauses automatic following until the arrow is selected.",
         "verification": {
-          "automated": "87 tests passed across 17 files; final typecheck and production build passed; git diff --check passed.",
+          "automated": "107 tests passed across 18 files, including 20 focused layout regressions; final typecheck, production build, and git diff --check passed.",
           "testEnvironment": "Added jsdom 30.0.1 as an exact dev dependency for the two Markdown-related test files. Production sanitizer unchanged. DOMPurify documents happy-dom as unsupported.",
           "browserViewports": [
             "1440x900",
@@ -243,12 +292,12 @@
             "320x568",
             "812x375"
           ],
-          "desktop": "Native browser review confirmed 12px within pairs and approximately 32px between pairs, progressively fainter older whole bubbles, fully opaque latest pair, correct left/right positioning and unchanged composer outline/shadow.",
+          "desktop": "At 1440x900, three consecutive short replies and every phase of a long streamed reply began at y=355px beside the face. History scrolling moved the latest reply naturally; the arrow restored the exact anchor. Existing left/right positioning, fading, composer styling, and nested scrolling remained intact.",
           "history": "Native wheel moved desktop history to 27px; minimize/reopen preserved 27px and all six messages. During another streamed response, scrollTop remained 509px as the reply grew from 1427 to 1989 characters.",
           "longReply": "A 318px intact bubble held a 284px body with 1614px content. Body followed to 1329.5px; native upward scrolling reached 979.5px and revealed Latest reply. Latest restored 1329.5px.",
-          "responsive": "Phone and tablet messages stayed relative and fully opaque with no horizontal page overflow. Mobile expand/collapse, short viewport reading mode, horizontally scrolling suggestions, and a 16px composer input verified.",
+          "responsive": "Phone and tablet messages stayed relative and fully opaque with no document panning. Pointer focus kept scrollY at 0; keyboard-sized focused viewports kept compact mode and the identity visible. Latest reply visibility changed transcript height by 0px. Explicit and true-short-viewport reading mode remains covered.",
           "interactions": "Suggestions sent through the actual frontend proxy to a local Spring-compatible SSE fixture, retained a typed draft and focused minimize. Contact links, HTTP 503 error display and subsequent recovery verified.",
-          "limitations": "Browser API checks used a local SSE fixture, not a live AI model. Physical mobile keyboard and touch behavior require real-device verification."
+          "limitations": "Browser API checks used a local SSE fixture, not a live AI model. Keyboard occlusion was modelled through focused viewport resizing; physical mobile keyboard and touch animation require real-device verification."
         },
         "deployed": false
       }

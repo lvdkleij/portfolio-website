@@ -63,11 +63,13 @@ onMounted(() => {
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) finishEntrance()
   const photo = root.value?.closest('main')?.querySelector<HTMLImageElement>('.desk-landing__image')
   if (!photo || !root.value || !identity.value || !experience.value || !conversation.value
-    || !transcript.value || !spacer.value || !form.value || !expand.value || !latest.value || !minimize.value) return
+    || !transcript.value || !spacer.value || !form.value || !input.value
+    || !expand.value || !latest.value || !minimize.value) return
   layout = createQuietDeskLayout({
     root: root.value, identity: identity.value, experience: experience.value,
     conversation: conversation.value, transcript: transcript.value, spacer: spacer.value,
-    form: form.value, expand: expand.value, latest: latest.value, minimize: minimize.value, photo
+    form: form.value, input: input.value, expand: expand.value,
+    latest: latest.value, minimize: minimize.value, photo
   })
   // Font metrics can change after the first layout even when the image is cached.
   void document.fonts?.ready.then(() => layout?.schedule())
@@ -184,7 +186,7 @@ function onKeydown(event: KeyboardEvent) {
             </div>
           </article>
         </div>
-        <button id="latest-reply" ref="latest" class="latest-reply" type="button" hidden>Latest reply ↓</button>
+        <button id="latest-reply" ref="latest" class="latest-reply" type="button" aria-label="Jump to latest reply" aria-controls="transcript" hidden><QuietDeskIcon name="down" /></button>
       </section>
 
       <div class="chat-dock" @animationend.self="finishEntrance" @animationcancel.self="finishEntrance">
@@ -379,6 +381,7 @@ button, input { color: inherit; font: inherit; }
   min-height: 0;
   padding: 4px 14px 10px 2px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   overflow-anchor: none;
   scrollbar-width: thin;
@@ -431,17 +434,27 @@ button, input { color: inherit; font: inherit; }
 }
 .chat-message--thinking { min-width: 106px; color: var(--muted); }
 .latest-reply {
+  display: inline-grid;
+  position: relative;
+  place-items: center;
   align-self: center;
   flex: 0 0 auto;
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background: var(--panel);
-  color: var(--ink);
-  font-size: 12px;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid rgba(185, 170, 152, 0.58);
+  border-radius: 50%;
+  background: rgba(241, 234, 222, 0.78);
+  color: var(--muted);
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
 }
+.latest-reply::before { content: ''; position: absolute; inset: -5px; border-radius: 50%; }
+.latest-reply svg { width: 15px; height: 15px; }
+.latest-reply:hover { border-color: var(--line); background: var(--panel); color: var(--ink); }
 [data-chat-mode="docked"] .conversation {
+  top: auto;
+  bottom: var(--conversation-bottom, 80px);
   overflow: hidden;
   border: 1px solid rgba(185, 170, 152, 0.9);
   border-radius: 20px;
@@ -452,7 +465,17 @@ button, input { color: inherit; font: inherit; }
 [data-chat-mode="docked"] .conversation-scroll { gap: 12px; padding: 14px 16px; }
 [data-chat-mode="docked"] .chat-message--assistant { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 [data-chat-mode="docked"] .chat-message--user { background: var(--paper); }
-[data-chat-mode="docked"] .latest-reply { margin-bottom: 10px; }
+[data-chat-mode="docked"] .latest-reply {
+  position: absolute;
+  z-index: 3;
+  top: 5px;
+  bottom: auto;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  box-shadow: none;
+}
+[data-chat-mode="docked"] .conversation-scroll { touch-action: pan-y; }
 .quiet-ui.is-chat-reading .quiet-stack { visibility: hidden; }
 .capabilities { margin-top: 14px; border-top: 1px solid var(--line); }
 .capability-row { display: grid; grid-template-columns: 72px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(185, 170, 152, 0.45); font-size: 12px; line-height: 1.5; }
@@ -518,9 +541,21 @@ button, input { color: inherit; font: inherit; }
   scrollbar-width: thin;
   scrollbar-color: rgba(98, 88, 76, 0.35) transparent;
 }
+@media (max-width: 639px) {
+  .prompt-suggestions {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(98, 88, 76, 0.35) transparent;
+  }
+}
 
 .chat-message-body { display: contents; }
 #conversation-spacer { display: none; }
+
+[data-chat-mode="portrait"] .conversation { height: var(--conversation-height); }
 
 [data-chat-mode="portrait"] #conversation-spacer:not([hidden]) {
   display: block;
@@ -556,6 +591,13 @@ button, input { color: inherit; font: inherit; }
   justify-content: flex-end;
   gap: 8px;
   transform: translateX(calc(-100% - 16px));
+}
+[data-chat-mode="portrait"] .latest-reply {
+  /* Showing this control must not move a bubble being read or scrolled. */
+  position: absolute;
+  right: calc(100% + 16px);
+  bottom: 0;
+  white-space: nowrap;
 }
 [data-chat-mode="portrait"] .chat-message-body {
   display: block;
