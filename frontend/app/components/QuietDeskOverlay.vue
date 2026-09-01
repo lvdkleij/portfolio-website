@@ -17,6 +17,7 @@ interface Message {
 const suggestions = ['What do you work with?', "What's your background?", 'How can I reach you?']
 const entering = ref(true)
 const visible = ref(false)
+const preparingNewTurn = ref(false)
 const draft = ref('')
 const messages = ref<Message[]>([])
 const announcement = ref('')
@@ -43,6 +44,7 @@ const historyToggle = ref<HTMLButtonElement | null>(null)
 let layout: ReturnType<typeof createQuietDeskLayout> | undefined
 let activeMessageId: number | undefined
 let nextId = 1
+let revealFrame = 0
 
 function finishEntrance() {
   entering.value = false
@@ -77,6 +79,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   activeMessageId = undefined
+  cancelAnimationFrame(revealFrame)
   dispose()
   layout?.dispose()
   layout = undefined
@@ -114,11 +117,23 @@ async function streamReply(user: Message, replyId: number) {
   scheduleLayout()
 }
 
+function revealPreparedTurn() {
+  cancelAnimationFrame(revealFrame)
+  // Commit the new bubble geometry while it is hidden and transitions are
+  // disabled. Reveal on the following paint so retained opacity cannot flash.
+  revealFrame = requestAnimationFrame(() => {
+    revealFrame = 0
+    preparingNewTurn.value = false
+  })
+}
+
 async function submit(event: SubmitEvent) {
   const submitter = event.submitter as HTMLButtonElement | null
   const example = submitter?.dataset.prompt
   const question = (example ?? draft.value).trim()
   if (!question || question.length > 2000 || thinking.value) return
+  const reopeningWithHistory = !visible.value && messages.value.length > 0
+  if (reopeningWithHistory) preparingNewTurn.value = true
   finishEntrance()
   announcement.value = ''
   const user: Message = { id: nextId++, role: 'user', text: question }
@@ -131,7 +146,12 @@ async function submit(event: SubmitEvent) {
   visible.value = true
   void streamReply(user, replyId)
   await nextTick()
-  layout?.followLatest()
+  if (reopeningWithHistory && layout) {
+    layout.followLatest(revealPreparedTurn)
+  } else {
+    layout?.followLatest()
+    preparingNewTurn.value = false
+  }
   // Suggestions should not summon the mobile keyboard or discard a typed draft.
   ;(example === undefined ? input.value : minimize.value)?.focus({ preventScroll: true })
 }
@@ -154,7 +174,7 @@ function onKeydown(event: KeyboardEvent) {
     </section>
 
     <div ref="experience" class="chat-experience" data-chat-mode="docked">
-      <section id="conversation" ref="conversation" class="conversation" aria-label="Conversation" :hidden="!visible">
+      <section id="conversation" ref="conversation" class="conversation" :class="{ 'is-preparing-turn': preparingNewTurn }" aria-label="Conversation" :hidden="!visible">
         <header class="conversation-header">
           <p class="conversation-caption">AI-generated replies</p>
           <div class="conversation-actions">
@@ -360,6 +380,13 @@ button, input { color: inherit; font: inherit; }
   max-height: var(--conversation-height, 420px);
   min-height: 0;
   pointer-events: auto;
+}
+.conversation.is-preparing-turn {
+  visibility: hidden;
+  pointer-events: none;
+}
+.conversation.is-preparing-turn .chat-message {
+  transition: none !important;
 }
 .conversation-header {
   display: flex;

@@ -15,7 +15,7 @@ export interface QuietDeskLayoutElements {
 
 export interface QuietDeskLayoutController {
   schedule: () => void
-  followLatest: () => void
+  followLatest: (afterLayout?: () => void) => void
   toggleExpanded: () => void
   collapse: () => void
   dispose: () => void
@@ -68,6 +68,7 @@ export function createQuietDeskLayout(elements: QuietDeskLayoutElements): QuietD
   let revealLatestBody = false
   let pendingLatest = false
   let pendingOuterScrollTop: number | undefined
+  const afterLayoutCallbacks: Array<() => void> = []
   let lastLayoutVisible = false
   let wheelGesture: WheelGesture | undefined
   let disposed = false
@@ -456,11 +457,16 @@ export function createQuietDeskLayout(elements: QuietDeskLayoutElements): QuietD
         syncBodyScrollTracking(getMessages())
       }
       lastLayoutVisible = visible
+      if (visible && afterLayoutCallbacks.length) {
+        const callbacks = afterLayoutCallbacks.splice(0)
+        for (const callback of callbacks) callback()
+      }
     })
   }
 
-  function followLatest(): void {
+  function followLatest(afterLayout?: () => void): void {
     if (disposed) return
+    if (afterLayout) afterLayoutCallbacks.push(afterLayout)
     followingLatest = true
     revealLatestBody = true
     pendingLatest = true
@@ -656,6 +662,7 @@ export function createQuietDeskLayout(elements: QuietDeskLayoutElements): QuietD
     observedDesktopBubbles.clear()
     for (const [body, state] of bodyScrollStates) body.removeEventListener('scroll', state.onScroll)
     bodyScrollStates.clear()
+    afterLayoutCallbacks.length = 0
     newestAssistantBody = undefined
     wheelGesture = undefined
     transcript.removeEventListener('scroll', onScroll)
