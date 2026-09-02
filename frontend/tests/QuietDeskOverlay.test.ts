@@ -170,6 +170,21 @@ describe('quiet desk conversation', () => {
     expect(document.activeElement).toBe(wrapper.get('#minimize-chat').element);
   });
 
+  it('uses the model stream as the only source of contact-answer content', async () => {
+    const wrapper = mount(QuietDeskOverlay);
+    await wrapper.get('#chat-input').setValue('How can I reach you?');
+    await wrapper.get('#chat-form').trigger('submit');
+    await finishReply('Contact details are available when I include them in this streamed reply.');
+
+    expect(JSON.parse(String(fetchSpy.mock.calls[0]?.[1]?.body)).messages).toEqual([
+      { id: expect.any(String), role: 'user', content: 'How can I reach you?' },
+    ]);
+    expect(wrapper.get('.chat-message--assistant').text()).toBe(
+      'Contact details are available when I include them in this streamed reply.',
+    );
+    expect(wrapper.find('.chat-message--assistant a, .message-links').exists()).toBe(false);
+  });
+
   it('restores suggestions when minimized and prevents duplicate requests while a reply is pending', async () => {
     const wrapper = mount(QuietDeskOverlay, { attachTo: document.body });
     await wrapper.get('#chat-input').setValue('Hello');
@@ -217,11 +232,47 @@ describe('quiet desk conversation', () => {
       await nextTick();
 
       expect(wrapper.get('#conversation').classes()).toContain('is-preparing-turn');
+      expect(wrapper.get('#conversation').classes()).toContain('is-stabilizing-turn');
       expect(wrapper.findAll('.chat-message')).toHaveLength(4);
       await vi.advanceTimersByTimeAsync(40);
       await nextTick();
       await submission;
       expect(wrapper.get('#conversation').classes()).not.toContain('is-preparing-turn');
+      expect(wrapper.get('#conversation').classes()).not.toContain('is-stabilizing-turn');
+      await finishReply('Second answer.');
+    } finally {
+      wrapper.unmount();
+      main.remove();
+    }
+  });
+
+  it('stabilizes a visible follow-up without hiding the conversation', async () => {
+    const main = document.createElement('main');
+    main.innerHTML = '<img class="desk-landing__image" alt=""><div id="quiet-desk-visible-test"></div>';
+    document.body.append(main);
+    const wrapper = mount(QuietDeskOverlay, {
+      attachTo: main.querySelector<HTMLElement>('#quiet-desk-visible-test')!,
+    });
+
+    try {
+      await wrapper.get('#chat-input').setValue('First question');
+      await wrapper.get('#chat-form').trigger('submit');
+      await finishReply('First answer.');
+      await wrapper.get('#chat-input').setValue('Second question');
+
+      const submission = wrapper.get('#chat-form').trigger('submit');
+      await nextTick();
+
+      const conversation = wrapper.get('#conversation');
+      expect(conversation.attributes('hidden')).toBeUndefined();
+      expect(conversation.classes()).not.toContain('is-preparing-turn');
+      expect(conversation.classes()).toContain('is-stabilizing-turn');
+      expect(wrapper.findAll('.chat-message')).toHaveLength(4);
+
+      await vi.advanceTimersByTimeAsync(40);
+      await nextTick();
+      await submission;
+      expect(conversation.classes()).not.toContain('is-stabilizing-turn');
       await finishReply('Second answer.');
     } finally {
       wrapper.unmount();

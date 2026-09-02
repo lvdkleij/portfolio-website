@@ -10,7 +10,6 @@ interface Message {
   role: 'assistant' | 'user'
   text: string
   pending?: boolean
-  contacts?: boolean
   error?: string
 }
 
@@ -18,6 +17,7 @@ const suggestions = ['What do you work with?', "What's your background?", 'How c
 const entering = ref(true)
 const visible = ref(false)
 const preparingNewTurn = ref(false)
+const stabilizingNewTurn = ref(false)
 const draft = ref('')
 const messages = ref<Message[]>([])
 const announcement = ref('')
@@ -119,11 +119,13 @@ async function streamReply(user: Message, replyId: number) {
 
 function revealPreparedTurn() {
   cancelAnimationFrame(revealFrame)
-  // Commit the new bubble geometry while it is hidden and transitions are
-  // disabled. Reveal on the following paint so retained opacity cannot flash.
+  // Commit the new bubble geometry with transitions disabled. Re-enable them
+  // on the following paint so the previous reply cannot flash at its new
+  // history position while its opacity catches up.
   revealFrame = requestAnimationFrame(() => {
     revealFrame = 0
     preparingNewTurn.value = false
+    stabilizingNewTurn.value = false
   })
 }
 
@@ -132,25 +134,25 @@ async function submit(event: SubmitEvent) {
   const example = submitter?.dataset.prompt
   const question = (example ?? draft.value).trim()
   if (!question || question.length > 2000 || thinking.value) return
-  const reopeningWithHistory = !visible.value && messages.value.length > 0
+  const hasHistory = messages.value.length > 0
+  const reopeningWithHistory = !visible.value && hasHistory
   if (reopeningWithHistory) preparingNewTurn.value = true
+  if (hasHistory) stabilizingNewTurn.value = true
   finishEntrance()
   announcement.value = ''
   const user: Message = { id: nextId++, role: 'user', text: question }
   const replyId = nextId++
-  messages.value.push(user, {
-    id: replyId, role: 'assistant', text: '', pending: true,
-    contacts: /contact|linkedin|github|reach/i.test(question)
-  })
+  messages.value.push(user, { id: replyId, role: 'assistant', text: '', pending: true })
   if (example === undefined) draft.value = ''
   visible.value = true
   void streamReply(user, replyId)
   await nextTick()
-  if (reopeningWithHistory && layout) {
+  if (hasHistory && layout) {
     layout.followLatest(revealPreparedTurn)
   } else {
     layout?.followLatest()
     preparingNewTurn.value = false
+    stabilizingNewTurn.value = false
   }
   // Suggestions should not summon the mobile keyboard or discard a typed draft.
   ;(example === undefined ? input.value : minimize.value)?.focus({ preventScroll: true })
@@ -174,7 +176,7 @@ function onKeydown(event: KeyboardEvent) {
     </section>
 
     <div ref="experience" class="chat-experience" data-chat-mode="docked">
-      <section id="conversation" ref="conversation" class="conversation" :class="{ 'is-preparing-turn': preparingNewTurn }" aria-label="Conversation" :hidden="!visible">
+      <section id="conversation" ref="conversation" class="conversation" :class="{ 'is-preparing-turn': preparingNewTurn, 'is-stabilizing-turn': stabilizingNewTurn }" aria-label="Conversation" :hidden="!visible">
         <header class="conversation-header">
           <p class="conversation-caption">AI-generated replies</p>
           <div class="conversation-actions">
@@ -199,10 +201,6 @@ function onKeydown(event: KeyboardEvent) {
               <div v-else-if="message.html" class="message-markdown" v-html="message.html" />
               <p v-else-if="message.pending">Thinking…</p>
               <p v-if="message.error" class="message-error" role="alert">{{ message.error }}</p>
-              <div v-if="message.contacts && !message.pending && !message.error" class="message-links">
-                <a href="https://www.linkedin.com/in/lucas-van-der-kleij" target="_blank" rel="noopener noreferrer">LinkedIn<QuietDeskIcon name="external" /></a>
-                <a href="https://github.com/lvdkleij" target="_blank" rel="noopener noreferrer">GitHub<QuietDeskIcon name="external" /></a>
-              </div>
             </div>
           </article>
         </div>
@@ -281,7 +279,6 @@ button, input { color: inherit; font: inherit; }
 
 .bottom-composer input:focus, .bottom-composer input:focus-visible { outline: none; box-shadow: none; }
 .composer-send:disabled { opacity: 0.45; }
-.message-links svg { width: 14px; height: 14px; }
 .message-error { margin-top: 8px !important; color: #8b342f; }
 .message-markdown :deep(p) { margin: 0; white-space: normal; }
 .message-markdown :deep(p + p) { margin-top: 12px; }
@@ -385,7 +382,7 @@ button, input { color: inherit; font: inherit; }
   visibility: hidden;
   pointer-events: none;
 }
-.conversation.is-preparing-turn .chat-message {
+.conversation.is-stabilizing-turn .chat-message {
   transition: none !important;
 }
 .conversation-header {
@@ -399,6 +396,14 @@ button, input { color: inherit; font: inherit; }
 .conversation-caption { margin: 0; color: var(--muted); font-size: 11px; line-height: 16px; }
 .conversation-actions { display: flex; flex: 0 0 auto; }
 .conversation-actions .icon-button { border-radius: 50%; }
+.conversation-actions #minimize-chat {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+}
+.conversation-actions #minimize-chat::before { content: ''; position: absolute; inset: -5px; border-radius: 50%; }
+.conversation-actions #minimize-chat svg { width: 15px; height: 15px; }
 .conversation-actions .icon-button:hover { background: rgba(241, 234, 222, 0.5); }
 .conversation-scroll {
   display: flex;
@@ -546,20 +551,6 @@ button, input { color: inherit; font: inherit; }
   transform: translateY(-2px);
 }
 .prompt-chip:disabled { opacity: 0.55; cursor: default; }
-.message-links { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; }
-.message-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 44px;
-  color: var(--ink);
-  font-size: 13px;
-  text-decoration: underline;
-  text-decoration-color: var(--line);
-  text-underline-offset: 4px;
-}
-.message-links a:hover { color: var(--focus); }
-.message-links svg { font-size: 14px; }
 .chat-experience.is-short-viewport .prompt-suggestions {
   flex-wrap: nowrap;
   justify-content: flex-start;
