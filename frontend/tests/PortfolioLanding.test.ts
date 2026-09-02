@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { enableAutoUnmount, mount } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { createSSRApp, nextTick } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import PortfolioLanding from '~/pages/index.vue'
@@ -52,6 +52,23 @@ describe('portfolio landing page', () => {
     ])
     expect(wrapper.find('nav, [role="dialog"], .portfolio-assistant, video, canvas').exists()).toBe(false)
     expect(wrapper.get('#conversation').attributes('hidden')).toBeDefined()
+  })
+
+  it('adds current Brussels weather to the clock when it is available', async () => {
+    vi.stubGlobal('$fetch', vi.fn(async () => ({
+      icon: 'rain',
+      iconNum: 11,
+      summary: 'Rain',
+      temperature: 13.6
+    })))
+
+    const wrapper = mount(PortfolioLanding)
+    await flushPromises()
+
+    expect(wrapper.get('.brussels-clock__weather').text()).toBe('14°RAIN')
+    expect(wrapper.get('.brussels-clock__weather img').attributes('src')).toBe('/weather/amcharts/animated/rainy-5.svg')
+    expect(wrapper.get('.brussels-clock__weather source').attributes('srcset')).toBe('/weather/amcharts/static/rainy-5.svg')
+    expect(wrapper.get('.brussels-clock').attributes('aria-label')).toContain('Current weather: Rain, 14 degrees Celsius')
   })
 
   it('prerenders the original image and chat entry without requiring JavaScript', async () => {
