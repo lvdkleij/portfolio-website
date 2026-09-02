@@ -58,10 +58,27 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Configure weather secret
+        env:
+          METEOSOURCE_API_KEY: ${{ secrets.METEOSOURCE_API_KEY }}
+        run: |
+          if [[ -z "${METEOSOURCE_API_KEY}" ]]; then
+            echo "::error::The METEOSOURCE_API_KEY production secret is not configured."
+            exit 1
+          fi
+
+          az containerapp secret set \
+            --name ca-portfolio-frontend-prod \
+            --resource-group rg-portfolio-prod \
+            --secrets "meteosource-api-key=${METEOSOURCE_API_KEY}" \
+            --output none
+
       - name: Deploy image
         run: |
           az containerapp update \
             --name ca-portfolio-frontend-prod \
             --resource-group rg-portfolio-prod \
             --container-name frontend \
-            --image ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --set-env-vars \
+              NUXT_METEOSOURCE_API_KEY=secretref:meteosource-api-key
