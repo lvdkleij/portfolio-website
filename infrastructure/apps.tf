@@ -262,8 +262,8 @@ resource "cloudflare_ruleset" "country_allowlist" {
 
   rules = [{
     ref         = "block_countries_outside_allowlist"
-    description = "Block traffic outside BE, ES, IT, PT, GB, NL, LU, FR and DE"
-    expression  = "(not ip.src.country in {\"BE\" \"ES\" \"IT\" \"PT\" \"GB\" \"NL\" \"LU\" \"FR\" \"DE\"})"
+    description = "Block traffic outside BE, ES, IT, PT, GB, NL, LU, FR and DE, except verified LinkedIn previews"
+    expression  = "(not (cf.client.bot and http.user_agent contains \"LinkedInBot\") and not ip.src.country in {\"BE\" \"ES\" \"IT\" \"PT\" \"GB\" \"NL\" \"LU\" \"FR\" \"DE\"})"
     action      = "block"
     enabled     = true
   }]

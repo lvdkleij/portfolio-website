@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import QuietDeskOverlay from '~/components/QuietDeskOverlay.vue'
+import { getWeatherIcon, getWeatherLabel } from '~/utils/weather'
 
 useSeoMeta({
   title: 'Lucas van der Kleij — Software Engineer',
@@ -25,7 +26,16 @@ useHead({
 
 const brusselsDisplay = ref('— —:—')
 const brusselsIso = ref('')
+const currentWeather = ref<{
+  icon: string
+  iconNum: number
+  summary: string
+  temperature: number
+} | null>(null)
+
 let brusselsTimer: ReturnType<typeof setInterval> | undefined
+let weatherTimer: ReturnType<typeof setInterval> | undefined
+let isMounted = false
 
 const brusselsFormatter = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Europe/Brussels',
@@ -42,21 +52,69 @@ function updateBrusselsTime() {
   brusselsIso.value = now.toISOString()
 }
 
+const weatherIcon = computed(() => currentWeather.value ? getWeatherIcon(currentWeather.value.iconNum) : 'cloudy')
+const weatherLabel = computed(() => currentWeather.value
+  ? getWeatherLabel(currentWeather.value.iconNum, currentWeather.value.summary)
+  : '')
+const clockAriaLabel = computed(() => {
+  if (!currentWeather.value) return `Local time in Brussels: ${brusselsDisplay.value}`
+
+  return `Local time in Brussels: ${brusselsDisplay.value}. Current weather: ${currentWeather.value.summary}, ${Math.round(currentWeather.value.temperature)} degrees Celsius.`
+})
+
+async function updateBrusselsWeather() {
+  try {
+    const weather = await $fetch<typeof currentWeather.value>('/api/weather')
+    if (isMounted && weather) currentWeather.value = weather
+  } catch {
+    // Weather is supplementary; keep the clock usable if the provider is unavailable.
+  }
+}
+
 onMounted(() => {
+  isMounted = true
   updateBrusselsTime()
+  void updateBrusselsWeather()
   brusselsTimer = setInterval(updateBrusselsTime, 1000)
+  weatherTimer = setInterval(updateBrusselsWeather, 15 * 60 * 1000)
 })
 
 onBeforeUnmount(() => {
+  isMounted = false
   if (brusselsTimer) clearInterval(brusselsTimer)
+  if (weatherTimer) clearInterval(weatherTimer)
 })
 </script>
 
 <template>
   <main class="desk-landing" aria-label="Lucas van der Kleij">
-    <div class="brussels-clock" role="group" :aria-label="`Local time in Brussels: ${brusselsDisplay}`">
+    <div class="brussels-clock" role="group" :aria-label="clockAriaLabel">
       <span class="brussels-clock__dot" aria-hidden="true" />
       <span>BRUSSELS</span>
+      <template v-if="currentWeather">
+        <span class="brussels-clock__divider" aria-hidden="true" />
+        <span
+          class="brussels-clock__weather"
+          :title="`${currentWeather.summary} · Weather icons by amCharts (CC BY 4.0)`"
+          aria-hidden="true"
+        >
+          <picture class="brussels-clock__weather-icon">
+            <source
+              media="(prefers-reduced-motion: reduce)"
+              :srcset="`/weather/amcharts/static/${weatherIcon}.svg`"
+            >
+            <img
+              :src="`/weather/amcharts/animated/${weatherIcon}.svg`"
+              alt=""
+              width="24"
+              height="24"
+            >
+          </picture>
+          <span>{{ Math.round(currentWeather.temperature) }}°</span>
+          <span class="brussels-clock__weather-label">{{ weatherLabel }}</span>
+        </span>
+        <span class="brussels-clock__divider" aria-hidden="true" />
+      </template>
       <time :datetime="brusselsIso">{{ brusselsDisplay }}</time>
     </div>
     <div class="desk-landing__frame">
@@ -117,6 +175,40 @@ onBeforeUnmount(() => {
   flex: 0 0 5px;
   border-radius: 50%;
   background: #30d68b;
+}
+
+.brussels-clock__divider {
+  width: 1px;
+  height: 10px;
+  margin: 0 1px;
+  background: rgb(255 255 255 / 24%);
+}
+
+.brussels-clock__weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.brussels-clock__weather-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: -5px -2px -5px -3px;
+}
+
+.brussels-clock__weather-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brussels-clock__weather-label {
+  max-width: 14ch;
+  overflow: hidden;
+  color: #b9b9b9;
+  text-overflow: ellipsis;
 }
 
 .desk-landing__frame {

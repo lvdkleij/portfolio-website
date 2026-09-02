@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
+    meteosourceApiKey: '',
     public: {
       chatApiUrl: '/api/chat/stream',
       resumeUrl: ''
