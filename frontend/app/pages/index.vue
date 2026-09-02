@@ -151,6 +151,14 @@ onBeforeUnmount(() => {
   background: #e8e6e1;
 }
 
+:global(html.desk-page),
+:global(body.desk-page) {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .brussels-clock {
   position: absolute;
   z-index: 2;
@@ -232,16 +240,6 @@ onBeforeUnmount(() => {
     width: auto;
     max-width: 100%;
     aspect-ratio: 5 / 2;
-  }
-}
-
-@media (max-width: 1099px) {
-  :global(html.desk-page),
-  :global(body.desk-page) {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    overscroll-behavior: none;
   }
 }
 
