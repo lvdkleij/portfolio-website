@@ -39,8 +39,8 @@ resource "azurerm_cognitive_deployment" "aif_cd_portfolio_prod" {
 
   model {
     format  = "OpenAI"
-    name    = "gpt-4.1-mini"
-    version = "2025-04-14"
+    name    = "gpt-5-mini"
+    version = "2025-08-07"
   }
 
   sku {
