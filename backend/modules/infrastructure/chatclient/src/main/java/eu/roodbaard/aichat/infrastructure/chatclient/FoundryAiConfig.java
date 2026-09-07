@@ -1,13 +1,14 @@
 package eu.roodbaard.aichat.infrastructure.chatclient;
 
-import com.azure.identity.AuthenticationUtil;
-import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.openai.credential.BearerTokenCredential;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.azure.identity.AuthenticationUtil;
+import com.azure.identity.DefaultAzureCredentialBuilder;
+import com.openai.credential.BearerTokenCredential;
 
 @Configuration
 public class FoundryAiConfig {
@@ -31,7 +32,7 @@ public class FoundryAiConfig {
                 .credential(credential)
                 .microsoftFoundry(true)
                 .deploymentName(deploymentName)
-                .maxTokens(500)
+                .maxCompletionTokens(500)
                 .build();
 
         return OpenAiChatModel.builder()

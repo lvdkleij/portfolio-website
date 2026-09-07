@@ -21,6 +21,7 @@ const stabilizingNewTurn = ref(false)
 const draft = ref('')
 const messages = ref<Message[]>([])
 const announcement = ref('')
+const greetingPending = ref(false)
 const { active: thinking, responseText, error, start, dispose } = useChatStream({
   endpoint: '/api/v1/lucasai/stream'
 })
@@ -45,6 +46,16 @@ let layout: ReturnType<typeof createQuietDeskLayout> | undefined
 let activeMessageId: number | undefined
 let nextId = 1
 let revealFrame = 0
+let greetingTimer: ReturnType<typeof setTimeout> | undefined
+
+function cancelGreeting() {
+  clearTimeout(greetingTimer)
+  greetingTimer = undefined
+}
+
+watch(draft, (text) => {
+  if (text.trim()) cancelGreeting()
+}, { flush: 'sync' })
 
 function finishEntrance() {
   entering.value = false
@@ -62,6 +73,10 @@ watch(responseText, (text) => {
 }, { flush: 'sync' })
 
 onMounted(() => {
+  greetingTimer = setTimeout(() => {
+    greetingTimer = undefined
+    void greet()
+  }, 3000)
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) finishEntrance()
   const photo = root.value?.closest('main')?.querySelector<HTMLImageElement>('.desk-landing__image')
   if (!photo || !root.value || !identity.value || !experience.value || !conversation.value
@@ -78,6 +93,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  cancelGreeting()
   activeMessageId = undefined
   cancelAnimationFrame(revealFrame)
   dispose()
@@ -100,7 +116,7 @@ async function hideConversation() {
   historyToggle.value?.focus({ preventScroll: true })
 }
 
-async function streamReply(user: Message, replyId: number) {
+async function streamReply(user: Pick<Message, 'id' | 'text'>, replyId: number, automatic = false) {
   activeMessageId = replyId
   await start({
     clientRequestId: `quiet-${Date.now()}-${user.id}`,
@@ -111,10 +127,34 @@ async function streamReply(user: Message, replyId: number) {
   if (reply) {
     reply.pending = false
     reply.error = error.value?.message
-    announcement.value = reply.error ? '' : reply.text
+    // An optional welcome should not open the page with an empty/error bubble.
+    if (automatic && (reply.error || !reply.text.trim())) {
+      messages.value = messages.value.filter(message => message.id !== replyId)
+      visible.value = false
+      layout?.collapse()
+    } else {
+      announcement.value = reply.error ? '' : reply.text
+    }
   }
+  greetingPending.value = false
   activeMessageId = undefined
   scheduleLayout()
+}
+
+async function greet() {
+  if (messages.value.length || draft.value.trim() || thinking.value
+    || document.activeElement === input.value || document.hidden) return
+  finishEntrance()
+  const replyId = nextId++
+  greetingPending.value = true
+  messages.value.push({ id: replyId, role: 'assistant', text: '', pending: true })
+  visible.value = true
+  void streamReply({
+    id: replyId,
+    text: 'A visitor has just opened Lucas’s portfolio and has not asked a question yet. Say a brief, friendly hello in one short sentence and invite them to ask a question. No biography, links, or list of suggestions.'
+  }, replyId, true)
+  await nextTick()
+  layout?.followLatest()
 }
 
 function revealPreparedTurn() {
@@ -133,7 +173,15 @@ async function submit(event: SubmitEvent) {
   const submitter = event.submitter as HTMLButtonElement | null
   const example = submitter?.dataset.prompt
   const question = (example ?? draft.value).trim()
-  if (!question || question.length > 2000 || thinking.value) return
+  if (!question || question.length > 2000 || (thinking.value && !greetingPending.value)) return
+  cancelGreeting()
+  // The visitor's question takes priority over an unfinished welcome.
+  if (greetingPending.value) {
+    messages.value = messages.value.filter(message => message.id !== activeMessageId)
+    activeMessageId = undefined
+    greetingPending.value = false
+    dispose()
+  }
   const hasHistory = messages.value.length > 0
   const reopeningWithHistory = !visible.value && hasHistory
   if (reopeningWithHistory) preparingNewTurn.value = true
@@ -175,7 +223,7 @@ function onKeydown(event: KeyboardEvent) {
       </header>
     </section>
 
-    <div ref="experience" class="chat-experience" data-chat-mode="docked">
+    <div ref="experience" class="chat-experience" :class="{ 'is-welcome': messages.length === 1 && messages[0]?.role === 'assistant' }" data-chat-mode="docked">
       <section id="conversation" ref="conversation" class="conversation" :class="{ 'is-preparing-turn': preparingNewTurn, 'is-stabilizing-turn': stabilizingNewTurn }" aria-label="Conversation" :hidden="!visible">
         <header class="conversation-header">
           <p class="conversation-caption">AI-generated replies</p>
@@ -211,11 +259,12 @@ function onKeydown(event: KeyboardEvent) {
         <form id="chat-form" ref="form" class="bottom-composer" :class="{ 'has-message': draft.trim() }" aria-label="Ask me anything" @submit.prevent="submit">
           <button id="history-toggle" ref="historyToggle" class="history-toggle" type="button" aria-label="Show conversation" aria-controls="conversation" :aria-expanded="visible" :hidden="visible || !messages.length" @click="showConversation"><QuietDeskIcon name="history" /></button>
           <label class="sr-only" for="chat-input">Ask me anything</label>
-          <input id="chat-input" ref="input" v-model="draft" name="message" type="text" placeholder="Ask me anything…" autocomplete="off" maxlength="2000">
-          <button id="chat-send" class="composer-send" type="submit" aria-label="Send message" :disabled="!draft.trim() || thinking"><QuietDeskIcon name="send" /></button>
+          <input id="chat-input" ref="input" v-model="draft" name="message" type="text" placeholder="Ask me anything…" autocomplete="off" maxlength="2000" aria-describedby="conversation-memory-note" @focus="cancelGreeting">
+          <button id="chat-send" class="composer-send" type="submit" aria-label="Send message" :disabled="!draft.trim() || (thinking && !greetingPending)"><QuietDeskIcon name="send" /></button>
+          <p id="conversation-memory-note" class="conversation-memory-note">Conversation memory isn’t available yet.</p>
         </form>
         <div id="prompt-suggestions" class="prompt-suggestions" role="group" aria-label="Example questions" :hidden="visible">
-          <button v-for="question in suggestions" :key="question" class="prompt-chip" type="submit" form="chat-form" :data-prompt="question" :disabled="thinking">{{ question }}</button>
+          <button v-for="question in suggestions" :key="question" class="prompt-chip" type="submit" form="chat-form" :data-prompt="question" :disabled="thinking && !greetingPending">{{ question }}</button>
         </div>
       </div>
     </div>
@@ -310,8 +359,10 @@ button, input { color: inherit; font: inherit; }
 }
 .bottom-composer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  row-gap: 0;
   width: 100%;
   min-height: 56px;
   margin: 0;
@@ -319,6 +370,15 @@ button, input { color: inherit; font: inherit; }
   border: 1px solid rgba(185, 170, 152, 0.88);
   border-radius: 16px;
   background: rgba(241, 234, 222, 0.96);
+}
+.conversation-memory-note {
+  flex: 0 0 100%;
+  margin: 0;
+  padding: 0 13px 4px 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
 }
 .bottom-composer input {
   width: 0;
