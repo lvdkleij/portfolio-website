@@ -96,8 +96,129 @@ describe('quiet desk conversation', () => {
       'aria-live': 'off',
     });
     expect(wrapper.findAll('.prompt-chip').map(button => button.text())).toEqual(examplePrompts);
+    expect(wrapper.get('.chat-dock').text()).toContain('Conversation memory isn’t available yet.');
     expect(wrapper.findAll('.chat-message')).toHaveLength(0);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('waits three seconds before streaming an assistant-only hello without moving focus', async () => {
+    const wrapper = mount(QuietDeskOverlay, { attachTo: document.body });
+    const initialFocus = document.activeElement;
+
+    await vi.advanceTimersByTimeAsync(2999);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(wrapper.findAll('.chat-message')).toHaveLength(0);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await nextTick();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy.mock.calls[0]?.[0]).toBe('/api/v1/lucasai/stream');
+    expect(wrapper.get('#conversation').attributes('hidden')).toBeUndefined();
+    expect(wrapper.findAll('.chat-message--user')).toHaveLength(0);
+    expect(wrapper.findAll('.chat-message--assistant')).toHaveLength(1);
+    expect(wrapper.get('.chat-message--assistant').text()).toBe('Thinking…');
+    expect(document.activeElement).toBe(initialFocus);
+
+    await emitDelta('Hi, I’m Lucas.');
+    expect(wrapper.get('.chat-message--assistant').text()).toBe('Hi, I’m Lucas.');
+    await finishReply(' Feel free to ask me something.');
+    expect(wrapper.get('.chat-message--assistant').text()).toBe('Hi, I’m Lucas. Feel free to ask me something.');
+    expect(wrapper.get('#chat-announcement').text()).toBe('Hi, I’m Lucas. Feel free to ask me something.');
+    expect(document.activeElement).toBe(initialFocus);
+
+    await wrapper.get('#minimize-chat').trigger('click');
+    await wrapper.get('#history-toggle').trigger('click');
+    await vi.advanceTimersByTimeAsync(6000);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(wrapper.findAll('.chat-message')).toHaveLength(1);
+  });
+
+  it.each([false, true])('skips the automatic hello after typing, including a cleared draft (%s)', async (clearDraft) => {
+    const wrapper = mount(QuietDeskOverlay);
+    await vi.advanceTimersByTimeAsync(1000);
+    await wrapper.get('#chat-input').setValue('My question');
+    if (clearDraft) await wrapper.get('#chat-input').setValue('');
+
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(wrapper.get('#conversation').attributes('hidden')).toBeDefined();
+    expect(wrapper.get<HTMLInputElement>('#chat-input').element.value).toBe(clearDraft ? '' : 'My question');
+  });
+
+  it('skips the automatic hello while the visitor has focused the composer', async () => {
+    const wrapper = mount(QuietDeskOverlay, { attachTo: document.body });
+    wrapper.get<HTMLInputElement>('#chat-input').element.focus();
+
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(wrapper.findAll('.chat-message')).toHaveLength(0);
+    expect(document.activeElement).toBe(wrapper.get('#chat-input').element);
+  });
+
+  it('does not add a delayed hello after the visitor sends an example question', async () => {
+    const wrapper = mount(QuietDeskOverlay);
+    await wrapper.get('#chat-form').trigger('submit', { submitter: wrapper.get('.prompt-chip').element });
+    await finishReply('I work with Java and Kotlin.');
+
+    await vi.advanceTimersByTimeAsync(6000);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(wrapper.findAll('.chat-message--user')).toHaveLength(1);
+    expect(wrapper.findAll('.chat-message--assistant')).toHaveLength(1);
+  });
+
+  it('lets the visitor replace a pending automatic hello with their own question', async () => {
+    const wrapper = mount(QuietDeskOverlay);
+    await vi.advanceTimersByTimeAsync(3000);
+    const greetingSignal = requestSignal;
+    expect(greetingSignal?.aborted).toBe(false);
+
+    await wrapper.get('#chat-input').setValue('What are your skills?');
+    expect(wrapper.get('#chat-send').attributes('disabled')).toBeUndefined();
+    await wrapper.get('#chat-form').trigger('submit');
+    await settle();
+
+    expect(greetingSignal?.aborted).toBe(true);
+    expect(requestSignal?.aborted).toBe(false);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(wrapper.findAll('.chat-message--user')).toHaveLength(1);
+    expect(wrapper.get('.chat-message--user').text()).toBe('What are your skills?');
+    expect(wrapper.findAll('.chat-message--assistant')).toHaveLength(1);
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+
+    await finishReply('I build applications with Java and Kotlin.');
+    expect(wrapper.get('.chat-message--assistant').text()).toBe('I build applications with Java and Kotlin.');
+    expect(wrapper.get('#chat-announcement').text()).toBe('I build applications with Java and Kotlin.');
+  });
+
+  it.each(['unavailable', 'empty'])('quietly removes an automatic hello with an %s response and accepts a question', async (failure) => {
+    if (failure === 'unavailable') fetchSpy.mockResolvedValueOnce(new Response('', { status: 503 }));
+    const wrapper = mount(QuietDeskOverlay);
+    await vi.advanceTimersByTimeAsync(3000);
+    if (failure === 'empty') await finishReply('');
+    await settle();
+
+    expect(wrapper.findAll('.chat-message')).toHaveLength(0);
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+    expect(wrapper.get('#conversation').attributes('hidden')).toBeDefined();
+    expect(wrapper.get('#history-toggle').attributes('hidden')).toBeDefined();
+    expect(wrapper.get('#prompt-suggestions').attributes('hidden')).toBeUndefined();
+    expect(wrapper.get('#chat-announcement').text()).toBe('');
+
+    await wrapper.get('#chat-input').setValue('What are your skills?');
+    await wrapper.get('#chat-form').trigger('submit');
+    await finishReply('I build applications with Java and Kotlin.');
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(wrapper.get('.chat-message--assistant').text()).toBe('I build applications with Java and Kotlin.');
+  });
+
+  it('cancels the automatic hello when unmounted before the delay', async () => {
+    const wrapper = mount(QuietDeskOverlay);
+    await vi.advanceTimersByTimeAsync(1000);
+    wrapper.unmount();
+
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('keeps the regular send button first in the native form submission order', () => {

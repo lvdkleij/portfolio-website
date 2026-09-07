@@ -406,7 +406,8 @@ export function createQuietDeskLayout(elements: QuietDeskLayoutElements): QuietD
     } else {
       desktopReplyAnchorY = 0
       const spaceBelowFace = dockTop - 12 - Math.max(offsetTop + 76, faceClearBottom)
-      const needsReadingRoom = !keyboardOpen && (spaceBelowFace < 160 || height < 500)
+      const needsReadingRoom = !experience.classList.contains('is-welcome')
+        && !keyboardOpen && (spaceBelowFace < 160 || height < 500)
       forcedReading = needsReadingRoom || (keyboardOpen && readingBeforeKeyboard)
       reading = !conversation.hidden && (expanded || forcedReading)
       experience.classList.toggle('is-reading', reading)
