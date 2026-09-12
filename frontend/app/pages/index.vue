@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import QuietDeskOverlay from '~/components/QuietDeskOverlay.vue'
+import PortfolioPanel from '~/components/PortfolioPanel.vue'
 import { getWeatherIcon, getWeatherLabel } from '~/utils/weather'
 
 useSeoMeta({
@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
         decoding="async"
       >
     </div>
-    <QuietDeskOverlay />
+    <PortfolioPanel />
   </main>
 </template>
 
